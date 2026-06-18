@@ -11,9 +11,9 @@ public class StatusController {
     @GetMapping("/api/status")
     public Map<String, Object> status() {
         return Map.of(
-            "service", "Spring Boot API",
-            "status", "running",
-            "timestamp", LocalDateTime.now().toString()
+                "service", "Spring Boot API",
+                "status", "running",
+                "timestamp", LocalDateTime.now().toString()
         );
     }
 }
