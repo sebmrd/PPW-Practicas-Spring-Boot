@@ -1,29 +1,18 @@
 package ec.edu.ups.icc.fundamentos01.users.dtos;
 
-/*
- * DTO utilizado para devolver al cliente los datos públicos
- * de un usuario como respuesta de la API.
- * * No incluye password.
- * No incluye passwordHash.
- */
-public class UserResponseDto {
+import java.time.LocalDateTime;
 
+public class UserResponseDto {
+    
     private Long id;
     private String name;
     private String email;
+    private LocalDateTime createdAt; // Agregamos este campo
+    private LocalDateTime updatedAt; // Agregamos este campo
 
-    // Constructor vacío
     public UserResponseDto() {
     }
 
-    // Constructor lleno
-    public UserResponseDto(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
-
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -46,5 +35,21 @@ public class UserResponseDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

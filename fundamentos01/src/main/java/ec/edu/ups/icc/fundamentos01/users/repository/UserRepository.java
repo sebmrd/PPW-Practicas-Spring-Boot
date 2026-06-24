@@ -1,21 +1,18 @@
 package ec.edu.ups.icc.fundamentos01.users.repository;
 
-import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import org.apache.catalina.User;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
 
-public class UserRepository {
-    private List<User> users;
-
-    public UserRepository(List<User> users) {
-        this.users = users;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+/**
+ * Repositorio encargado de gestionar la persistencia
+ * de usuarios usando Spring Data JPA.
+ */
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    
+    // Spring Data JPA generará automáticamente la consulta SQL basada en el nombre del método
+    Optional<UserEntity> findByEmail(String email);
 }

@@ -17,7 +17,8 @@ public class UserModel {
     private String name;
     private String email;
     private LocalDateTime createdAt;
-
+    private LocalDateTime updatedAt; // Faltaba este campo
+    private boolean deleted;         // Faltaba este campo
 
     /**
      * Contraseña recibida desde la API.
@@ -76,6 +77,22 @@ public class UserModel {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -91,7 +108,5 @@ public class UserModel {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
-
-    // getters y setters
     
 }
