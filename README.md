@@ -40,3 +40,37 @@ Cliente → Controller → Service → Repository → Base de Datos (y viceversa
 ### ¿Qué problema evita mantener una estructura clara?
 
 Mantener esta separación estricta evita el "código espagueti", una mala práctica donde la lógica de acceso a datos, las reglas de negocio y el manejo de rutas HTTP se mezclan en un solo archivo. Al evitar esto, se previenen problemas como el alto acoplamiento (donde cambiar una línea de código rompe otra parte del sistema de forma inesperada), la dificultad para rastrear errores ("bugs") y la imposibilidad de reutilizar el código en el futuro.
+
+---
+
+
+---
+
+## Explicación breve de 05_repositorios_persistencia
+
+### Resultados y Evidencias - Persistencia con PostgreSQL
+
+En esta etapa de la práctica, se migró la persistencia de datos desde una lista en memoria hacia una base de datos real utilizando PostgreSQL, Spring Data JPA e Hibernate.
+
+#### Flujo de Datos
+Se implementó un flujo de arquitectura en capas que asegura el desacoplamiento entre la base de datos y la interfaz del usuario:
+
+1. Cliente: Envía peticiones HTTP.
+
+2. Controller: Recibe la petición y delega al servicio.
+
+3. Service: Implementa la lógica de negocio y utiliza el repositorio para las operaciones. 
+
+4. Repository: Ejecuta las operaciones de persistencia mediante JPA.
+
+5. Entity: Representa la estructura de la tabla en PostgreSQL.
+
+6. Mapper: Realiza la conversión entre DTO, Model y Entity.
+
+#### Auditoría con BaseEntity
+Se utilizó una superclase abstracta BaseEntity para centralizar la auditoría de todas las entidades . Esta clase, marcada con @MappedSuperclass, permite que UserEntity y ProductEntity hereden automáticamente los campos de auditoría (id, createdAt, updatedAt, deleted) sin duplicidad de código.
+
+#### Evidencia: Lista de productos en PostgreSQL
+Tras realizar las peticiones POST a través de la API, se verificó la persistencia mediante una consulta directa a la base de datos.
+
+![LIsta de Productos](assets\00_lista.png)
