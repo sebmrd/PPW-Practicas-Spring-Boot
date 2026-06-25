@@ -16,6 +16,15 @@ Entendí que un endpoint es como una "ventanilla de atención" en una dirección
 
 Su función principal es simplificarnos la vida utilizando algo llamado "servidores embebidos" . En lugar de obligarnos a instalar, configurar y encender un servidor externo manualmente para poder correr nuestra aplicación web , Spring Boot ya trae un servidor (Tomcat) empaquetado por defecto dentro del proyecto . Así, al momento de ejecutar nuestro código, el framework se encarga de encender automáticamente el servidor web y habilitar nuestros endpoints sin que tengamos que hacer configuraciones complejas.
 
+### Evidencias de Configuración
+![Java Version](assets/01-java-version.png)
+
+![Servidor Ejecutando](assets/02-servidor-ejecutando.png)
+
+![Respuesta JSON](assets/03-respuesta.png)
+
+![Existencia Java](assets/04-existencia_java.png)
+
 ---
 
 ## Explicación breve de 02_estructura_proyecto
@@ -41,8 +50,54 @@ Cliente → Controller → Service → Repository → Base de Datos (y viceversa
 
 Mantener esta separación estricta evita el "código espagueti", una mala práctica donde la lógica de acceso a datos, las reglas de negocio y el manejo de rutas HTTP se mezclan en un solo archivo. Al evitar esto, se previenen problemas como el alto acoplamiento (donde cambiar una línea de código rompe otra parte del sistema de forma inesperada), la dificultad para rastrear errores ("bugs") y la imposibilidad de reutilizar el código en el futuro.
 
+## Evidencias
+
+![Estructura del Proyecto](assets/05-estructura.png)
+![Java](assets/06-Java.png)
+![Árbol del Proyecto](assets/07-árbol.png)
+
 ---
 
+## Explicación breve de 03_api_rest
+
+En esta práctica inicial, se estableció la cimentación de nuestra API RESTful orientada al recurso de productos. El objetivo principal fue comprender el ciclo de vida de una petición HTTP desde su recepción hasta la respuesta, gestionando los datos en memoria mediante una estructura de lista (List<UserModel>).
+
+Para garantizar la seguridad y la correcta exposición de los datos, se implementó un patrón de diseño basado en DTOs (Data Transfer Objects). Esto permitió separar la estructura interna de los modelos de dominio de la información pública que se expone al cliente, utilizando Mappers para transformar los datos entre las capas de presentación y la lógica interna de manera automática. Se desarrollaron los seis endpoints fundamentales del CRUD, permitiendo operaciones completas de lectura, creación, actualización (total y parcial) y eliminación . 
+
+## Evidencias
+
+### Evidencias de endpoints (Products)
+
+![Get Products](assets/08_get_products.png)
+![Delete](assets/09_delete_product.png)
+![Get Product ID](assets/10_get_product.png)
+![Delete No Exits](assets/11_delete_product_noexits.png)
+
+---
+
+## Explicación breve de 04_servicios
+
+En esta etapa, el proyecto evolucionó hacia una arquitectura de software más madura, aplicando el principio de Responsabilidad Única (SRP) . La lógica que anteriormente residía en los controladores se trasladó a una capa de servicios dedicada, permitiendo que los controladores se enfoquen exclusivamente en la gestión de peticiones HTTP.
+
+### Arquitectura en Capas
+
+El flujo de datos se reestructuró para favorecer un desacoplamiento efectivo:
+
+1. Users/Products Controller: Actúa como el front-end de nuestra API, siendo el único punto de entrada para el cliente; su única responsabilidad es delegar la carga de trabajo al servicio correspondiente.
+
+2. UserService/ProductService (Interfaz): Define el contrato de operaciones disponibles, lo que permite que el sistema sea flexible ante futuras implementaciones sin alterar el controlador.
+
+3. ServiceImpl: Contiene la lógica de negocio y el estado del sistema (la lista en memoria), procesando los datos mediante la inyección de dependencias para operar sobre el modelo de dominio .
+
+### Explicación de Inyección de Dependencias
+
+Se implementó la Inyección de Dependencias por Constructor, una práctica recomendada en Spring Boot que mejora la legibilidad y facilita las pruebas unitarias. En lugar de instanciar manualmente los servicios dentro del controlador, Spring Boot detecta automáticamente las implementaciones marcadas con la anotación @Service y realiza el proceso de inyección de manera transparente al iniciar el contexto de la aplicación . Esto no solo reduce la complejidad del código, sino que garantiza que cada componente reciba sus dependencias necesarias en un entorno gestionado y seguro.
+
+## Evidencias
+
+![Product Service](assets/12_product_services.png)
+![Product Service](assets/13_product_services.png)
+![Product Controller](assets/14_product_controllers.png)
 
 ---
 
@@ -73,7 +128,7 @@ Se utilizó una superclase abstracta BaseEntity para centralizar la auditoría d
 #### Evidencia: Lista de productos en PostgreSQL
 Tras realizar las peticiones POST a través de la API, se verificó la persistencia mediante una consulta directa a la base de datos.
 
-![LIsta de Productos](assets\00_lista.png)
+![Lista Productos](assets/15_lista.png)
 
 ---
 
@@ -93,9 +148,11 @@ En esta práctica, se implementó una capa de validación robusta utilizando **J
 **1. Validación de Entrada (Error 400):**
 Al enviar datos que no cumplen las restricciones de validación, la API intercepta la petición y devuelve un error de tipo `Bad Request`.
 
-![Error POST inválido](ruta/a/tu/captura_error_400.png)
+![Post no Valido](assets/16_post_novalid.png)
 
 **2. Control de Reglas de Negocio:**
 Se validó exitosamente que el sistema impide operar sobre productos eliminados y los excluye de las consultas generales, garantizando la consistencia de los datos.
 
-![CRUD validado correctamente](ruta/a/tu/captura_reglas_negocio.png)
+![Post Valido](assets/17_post_valid.png)
+![Put Fallido](assets/18_put_deleted.png)
+![Producto Desaparece](assets/08_get_products.png)
