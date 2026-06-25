@@ -156,3 +156,55 @@ Se validó exitosamente que el sistema impide operar sobre productos eliminados 
 ![Post Valido](assets/17_post_valid.png)
 ![Put Fallido](assets/18_put_deleted.png)
 ![Producto Desaparece](assets/08_get_products.png)
+
+---
+
+## Explicación de 07_Control_Errores
+
+En esta práctica se implementó un sistema global de manejo de errores utilizando un `@RestControllerAdvice`. Esto permite centralizar las excepciones de la aplicación y devolver un formato único (`ErrorResponse`), eliminando los bloques try/catch de los controladores y evitando exponer trazas técnicas al cliente.
+
+A continuación, se presentan las evidencias de las validaciones implementadas en el módulo de productos (`products/`).
+
+### 1. Error por recurso inexistente (404 Not Found)
+
+Se valida la búsqueda de un producto que no existe en la base de datos lanzando una `NotFoundException`. 
+
+* Petición: `GET /api/products/5`
+* Resultado Esperado: Estado HTTP `404 Not Found` y el mensaje "Product not found".
+
+![Evidencia Producto Inexistente](asstes/21_get_404.png)
+
+### 2. Error por conflicto de reglas de negocio (409 Conflict)
+
+Se valida que no se pueda crear un producto con un nombre ya registrado, lanzando una `ConflictException`.
+
+* Petición: `POST /api/products` (Enviando un JSON con un nombre que ya existe en la BD).
+* Cuerpo enviado:
+    ```json
+    {
+        "name": "Iphone 17 Pro Max",
+        "price": 1125,
+        "stock": 3
+    }
+
+* Resultado Esperado: Estado HTTP `409 Conflict` y el texto "Product name already registered".
+
+![Evidencia Conflicto de Nombre](assets/19_post_409.png)
+
+### 3. Error por validación de DTO (400 Bad Request)
+
+Se valida la entrada de datos a través de las anotaciones `@Valid` en los DTOs. Si los datos no cumplen con los requisitos (nombres vacíos, precios o stock negativos), se captura la `MethodArgumentNotValidException`.
+
+* Petición: `POST /api/products`
+* Cuerpo enviado:
+  ```json
+  {
+    "name": "",
+    "price": -5,
+    "stock": -1
+  }
+* Resultado Esperado: Estado HTTP `400 Bad Request`
+
+![Evidencia Datos Inválidos](assets/20_post_400.png)
+
+---
