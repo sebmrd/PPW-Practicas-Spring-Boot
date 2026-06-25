@@ -26,6 +26,7 @@ public class UserMapper {
         model.setName(dto.getName());
         model.setEmail(dto.getEmail());
         model.setPassword(dto.getPassword());
+        model.setPasswordHash(dto.getPassword());
         model.setCreatedAt(LocalDateTime.now());
         model.setDeleted(false);
         
