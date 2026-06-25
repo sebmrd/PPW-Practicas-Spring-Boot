@@ -172,7 +172,7 @@ Se valida la búsqueda de un producto que no existe en la base de datos lanzando
 * Petición: `GET /api/products/5`
 * Resultado Esperado: Estado HTTP `404 Not Found` y el mensaje "Product not found".
 
-![Evidencia Producto Inexistente](asstes/21_get_404.png)
+![Evidencia Producto Inexistente](assets/21_get_404.png)
 
 ### 2. Error por conflicto de reglas de negocio (409 Conflict)
 
