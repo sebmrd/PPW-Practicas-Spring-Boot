@@ -6,6 +6,7 @@ public class ProductResponseDto {
     private Long id;
     private String name;
     private Double price;
+    private Integer stock;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -17,6 +18,9 @@ public class ProductResponseDto {
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
+
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

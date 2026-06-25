@@ -74,3 +74,28 @@ Se utilizó una superclase abstracta BaseEntity para centralizar la auditoría d
 Tras realizar las peticiones POST a través de la API, se verificó la persistencia mediante una consulta directa a la base de datos.
 
 ![LIsta de Productos](assets\00_lista.png)
+
+---
+
+## Explicación de 06_ValidaciónDTOs_&_ReglasNegocio
+
+En esta práctica, se implementó una capa de validación robusta utilizando **Jakarta Validation** para asegurar la integridad de los datos de entrada en los módulos de `users` y `products`.
+
+### Implementaciones clave:
+- [cite_start]**Validación de DTOs:** Se utilizaron anotaciones como `@NotBlank`, `@Size`, `@Email`, `@NotNull` y `@Min` para restringir los valores permitidos desde la capa de controlador mediante `@Valid` [cite: 625, 726-813, 1019-1040].
+- [cite_start]**Lógica de Dominio:** Se refactorizó la arquitectura eliminando los *Mappers* externos, moviendo la lógica de conversión a *Factory Methods* dentro de las clases modelo (`Product.java`), lo cual facilita la construcción y conversión de entidades [cite: 625, 1026-1034].
+- **Reglas de Negocio:** Se integraron validaciones en `ProductServiceImpl` para:
+    - Evitar la actualización o eliminación de productos ya marcados como eliminados lógicamente.
+    - [cite_start]Filtrar el listado (`findAll`) para no exponer productos eliminados [cite: 625, 1041-1045].
+
+### Evidencias
+
+**1. Validación de Entrada (Error 400):**
+Al enviar datos que no cumplen las restricciones de validación, la API intercepta la petición y devuelve un error de tipo `Bad Request`.
+
+![Error POST inválido](ruta/a/tu/captura_error_400.png)
+
+**2. Control de Reglas de Negocio:**
+Se validó exitosamente que el sistema impide operar sobre productos eliminados y los excluye de las consultas generales, garantizando la consistencia de los datos.
+
+![CRUD validado correctamente](ruta/a/tu/captura_reglas_negocio.png)

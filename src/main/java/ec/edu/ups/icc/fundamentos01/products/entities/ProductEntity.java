@@ -15,6 +15,9 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     private Double price;
 
+    @Column(nullable = false)
+    private Integer stock;
+    
     public ProductEntity() {
     }
 
@@ -23,4 +26,7 @@ public class ProductEntity extends BaseEntity {
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
+
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 }

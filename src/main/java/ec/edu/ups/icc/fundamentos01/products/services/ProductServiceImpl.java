@@ -4,8 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import ec.edu.ups.icc.fundamentos01.products.dtos.*;
 import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
-import ec.edu.ups.icc.fundamentos01.products.mappers.ProductMapper;
-import ec.edu.ups.icc.fundamentos01.products.models.ProductModel;
+import ec.edu.ups.icc.fundamentos01.products.models.Product; // Importamos el modelo
 import ec.edu.ups.icc.fundamentos01.products.repositories.ProductRepository;
 
 @Service
@@ -20,40 +19,44 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDto> findAll() {
         return productRepository.findAll().stream()
-                .map(ProductMapper::toModelFromEntity)
-                .map(ProductMapper::toResponse)
+                .filter(entity -> !entity.isDeleted()) // Regla de negocio: filtrar eliminados
+                .map(Product::fromEntity)              // Usamos el Factory Method del modelo
+                .map(Product::toResponseDto)
                 .toList();
     }
 
     @Override
     public ProductResponseDto findOne(Long id) {
-        return productRepository.findById(id)
-                .map(ProductMapper::toModelFromEntity)
-                .map(ProductMapper::toResponse)
+        ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
+        
+        if (entity.isDeleted()) {
+            throw new IllegalStateException("Product not found");
+        }
+
+        return Product.fromEntity(entity).toResponseDto();
     }
 
     @Override
     public ProductResponseDto create(CreateProductDto dto) {
-        ProductModel model = ProductMapper.toModelFromDTO(dto);
-        ProductEntity entity = ProductMapper.toEntityFromModel(model);
-        
-        ProductEntity savedEntity = productRepository.save(entity);
-        ProductModel savedModel = ProductMapper.toModelFromEntity(savedEntity);
-        
-        return ProductMapper.toResponse(savedModel);
+        Product product = Product.fromDto(dto); // Factory Method
+        ProductEntity savedEntity = productRepository.save(product.toEntity());
+        return Product.fromEntity(savedEntity).toResponseDto();
     }
 
     @Override
     public ProductResponseDto update(Long id, UpdateProductDto dto) {
         ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
+        
+        if (entity.isDeleted()) {
+            throw new IllegalStateException("Cannot update a deleted product");
+        }
 
-        entity.setName(dto.getName());
-        entity.setPrice(dto.getPrice());
-
-        ProductEntity savedEntity = productRepository.save(entity);
-        return ProductMapper.toResponse(ProductMapper.toModelFromEntity(savedEntity));
+        Product product = Product.fromEntity(entity);
+        product.update(dto); // Lógica de actualización en el modelo
+        ProductEntity savedEntity = productRepository.save(product.toEntity());
+        return Product.fromEntity(savedEntity).toResponseDto();
     }
 
     @Override
@@ -61,21 +64,24 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
 
-        if (dto.getName() != null) {
-            entity.setName(dto.getName());
-        }
-        if (dto.getPrice() != null) {
-            entity.setPrice(dto.getPrice());
+        if (entity.isDeleted()) {
+            throw new IllegalStateException("Cannot update a deleted product");
         }
 
-        ProductEntity savedEntity = productRepository.save(entity);
-        return ProductMapper.toResponse(ProductMapper.toModelFromEntity(savedEntity));
+        Product product = Product.fromEntity(entity);
+        product.partialUpdate(dto); // Lógica de actualización parcial en el modelo
+        ProductEntity savedEntity = productRepository.save(product.toEntity());
+        return Product.fromEntity(savedEntity).toResponseDto();
     }
 
     @Override
     public void delete(Long id) {
         ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
+
+        if (entity.isDeleted()) {
+            throw new IllegalStateException("Product is already deleted");
+        }
 
         entity.setDeleted(true);
         productRepository.save(entity);

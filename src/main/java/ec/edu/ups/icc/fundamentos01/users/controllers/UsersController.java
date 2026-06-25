@@ -2,6 +2,8 @@ package ec.edu.ups.icc.fundamentos01.users.controllers;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -61,7 +63,7 @@ public class UsersController {
      * POST /users
      */
     @PostMapping
-    public UserResponseDto create(@RequestBody CreateUserDto dto) {
+    public UserResponseDto create(@Valid @RequestBody CreateUserDto dto) {
         return service.create(dto);
     }
 
@@ -72,7 +74,7 @@ public class UsersController {
     @PutMapping("/{id}")
     public UserResponseDto update( // Cambiado de Object a UserResponseDto
             @PathVariable Long id,
-            @RequestBody UpdateUserDto dto
+            @Valid @RequestBody UpdateUserDto dto
     ) {
         return service.update(id, dto);
     }
@@ -84,7 +86,7 @@ public class UsersController {
     @PatchMapping("/{id}")
     public UserResponseDto partialUpdate( // Cambiado de Object a UserResponseDto
             @PathVariable Long id,
-            @RequestBody PartialUpdateUserDto dto
+            @Valid @RequestBody PartialUpdateUserDto dto
     ) {
         return service.partialUpdate(id, dto);
     }
