@@ -54,14 +54,16 @@ public class Product {
     }
 
     public ProductResponseDto toResponseDto() {
-        ProductResponseDto response = new ProductResponseDto();
-        response.setId(this.id);
-        response.setName(this.name);
-        response.setPrice(this.price);
-        response.setStock(this.stock);
-        response.setCreatedAt(this.createdAt);
-        response.setUpdatedAt(this.updatedAt);
-        return response;
+        return new ProductResponseDto(
+            this.id,
+            this.name,
+            this.price,
+            this.stock,
+            null, // owner
+            null, // category
+            this.createdAt,
+            this.updatedAt
+        );
     }
 
     // --- 3. REGLAS DE ACTUALIZACIÓN ---
