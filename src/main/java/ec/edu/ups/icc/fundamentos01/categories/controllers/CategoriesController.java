@@ -37,7 +37,7 @@ public class CategoriesController {
     }
 
     @GetMapping("/{id}")
-    public CategoryResponseDto findOne(@PathVariable Long id) {
+    public CategoryResponseDto findOne(@PathVariable("id") Long id) {
         return service.findOne(id);
     }
 
@@ -48,14 +48,14 @@ public class CategoriesController {
 
     @PutMapping("/{id}")
     public CategoryResponseDto update(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody UpdateCategoryDto dto
     ) {
         return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         service.delete(id);
     }
 }

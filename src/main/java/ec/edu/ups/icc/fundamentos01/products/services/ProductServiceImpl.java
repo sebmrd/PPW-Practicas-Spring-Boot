@@ -208,4 +208,13 @@ public class ProductServiceImpl implements ProductService {
 
         return ProductMapper.toResponse(savedEntity);
     }
+
+    /*
+     * Valida si un nombre de producto ya existe en la base de datos.
+     * Devuelve true si ya existe, false si está disponible.
+     */
+    @Override
+    public boolean validateName(String name) {
+        return productRepository.findByNameIgnoreCaseAndDeletedFalse(name).isPresent();
+    }
 }

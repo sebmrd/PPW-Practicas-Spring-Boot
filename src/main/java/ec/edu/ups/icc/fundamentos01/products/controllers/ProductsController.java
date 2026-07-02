@@ -22,7 +22,7 @@ public class ProductsController {
     }
 
     @GetMapping("/{id}")
-    public ProductResponseDto findOne(@PathVariable Long id) {
+    public ProductResponseDto findOne(@PathVariable("id") Long id) {
         return service.findOne(id);
     }
 
@@ -32,17 +32,17 @@ public class ProductsController {
     }
 
     @PutMapping("/{id}")
-    public ProductResponseDto update(@Valid @PathVariable Long id, @RequestBody UpdateProductDto dto) {
+    public ProductResponseDto update(@Valid @PathVariable("id") Long id, @RequestBody UpdateProductDto dto) {
         return service.update(id, dto);
     }
 
     @PatchMapping("/{id}")
-    public ProductResponseDto partialUpdate(@Valid @PathVariable Long id, @RequestBody PartialUpdateProductDto dto) {
+    public ProductResponseDto partialUpdate(@Valid @PathVariable("id") Long id, @RequestBody PartialUpdateProductDto dto) {
         return service.partialUpdate(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         service.delete(id);
     }
 
@@ -52,7 +52,7 @@ public class ProductsController {
      * GET /products/user/{userId}
      */
     @GetMapping("/user/{userId}")
-    public List<ProductResponseDto> findByUserId(@PathVariable Long userId) {
+    public List<ProductResponseDto> findByUserId(@PathVariable("userId") Long userId) {
         return service.findByUserId(userId);
     }
 
@@ -62,7 +62,24 @@ public class ProductsController {
      * GET /products/category/{categoryId}
      */
     @GetMapping("/category/{categoryId}")
-    public List<ProductResponseDto> findByCategoryId(@PathVariable Long categoryId) {
+    public List<ProductResponseDto> findByCategoryId(@PathVariable("categoryId") Long categoryId) {
         return service.findByCategoryId(categoryId);
+    }
+
+    /*
+     * Endpoint custom para validar si el nombre de un producto ya existe.
+     *
+     * POST /products/validate-name
+     */
+    @PostMapping("/validate-name")
+    public java.util.Map<String, Boolean> validateName(@RequestBody java.util.Map<String, String> request) {
+        // Extraemos el nombre del JSON que enviaste desde Bruno
+        String nameToCheck = request.get("name");
+        
+        // Llamamos al servicio para ver si existe
+        boolean exists = service.validateName(nameToCheck);
+        
+        // Devolvemos un JSON estructurado de respuesta
+        return java.util.Map.of("exists", exists);
     }
 }
