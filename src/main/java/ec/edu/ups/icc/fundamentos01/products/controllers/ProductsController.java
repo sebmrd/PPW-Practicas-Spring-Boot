@@ -47,26 +47,6 @@ public class ProductsController {
     }
 
     /*
-     * Endpoint para buscar productos por id de usuario.
-     *
-     * GET /products/user/{userId}
-     */
-    @GetMapping("/user/{userId}")
-    public List<ProductResponseDto> findByUserId(@PathVariable("userId") Long userId) {
-        return service.findByUserId(userId);
-    }
-
-    /*
-     * Endpoint para buscar productos por id de categoría.
-     *
-     * GET /products/category/{categoryId}
-     */
-    @GetMapping("/category/{categoryId}")
-    public List<ProductResponseDto> findByCategoryId(@PathVariable("categoryId") Long categoryId) {
-        return service.findByCategoryId(categoryId);
-    }
-
-    /*
      * Endpoint custom para validar si el nombre de un producto ya existe.
      *
      * POST /products/validate-name

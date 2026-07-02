@@ -12,6 +12,7 @@ import ec.edu.ups.icc.fundamentos01.users.repository.UserRepository;
 import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.NotFoundException;
 import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.categories.repositories.CategoryRepository;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.BadRequestException;
 import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.ConflictException;
 
 /*
@@ -216,5 +217,65 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean validateName(String name) {
         return productRepository.findByNameIgnoreCaseAndDeletedFalse(name).isPresent();
+    }
+
+    @Override
+    public List<ProductResponseDto> findByUserIdWithFilters(Long userId, ProductFilterByUserDto filters) {
+        if (!userRepository.existsByIdAndDeletedFalse(userId)) {
+            throw new NotFoundException("User not found");
+        }
+        
+        validateUserFilters(filters);
+        String name = normalizeName(filters.getName());
+        
+        List<ProductEntity> list = productRepository.findByOwnerIdWithFilters(
+                userId, name, filters.getMinPrice(), filters.getMaxPrice(), filters.getCategoryId()
+        );
+        
+        return ProductMapper.toResponseList(list);
+    }
+
+    @Override
+    public List<ProductResponseDto> findByCategoryIdWithFilters(Long categoryId, ProductFilterByCategoryDto filters) {
+        if (!categoryRepository.existsByIdAndDeletedFalse(categoryId)) {
+            throw new NotFoundException("Category not found");
+        }
+        
+        validateCategoryFilters(filters);
+        String name = normalizeName(filters.getName());
+        
+        List<ProductEntity> list = productRepository.findByCategoryIdWithFilters(
+                categoryId, name, filters.getMinPrice(), filters.getMaxPrice(), filters.getUserId()
+        );
+        
+        return ProductMapper.toResponseList(list);
+    }
+
+    // --- Helpers Privados ---
+    private void validateUserFilters(ProductFilterByUserDto filters) {
+        if (filters == null) return;
+        if (!filters.hasValidPriceRange()) {
+            throw new BadRequestException("El precio máximo debe ser mayor o igual al mínimo");
+        }
+        if (filters.getCategoryId() != null && !categoryRepository.existsByIdAndDeletedFalse(filters.getCategoryId())) {
+            throw new NotFoundException("Category not found");
+        }
+    }
+
+    private void validateCategoryFilters(ProductFilterByCategoryDto filters) {
+        if (filters == null) return;
+        if (!filters.hasValidPriceRange()) {
+            throw new BadRequestException("El precio máximo debe ser mayor o igual al mínimo");
+        }
+        if (filters.getUserId() != null && !userRepository.existsByIdAndDeletedFalse(filters.getUserId())) {
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    private String normalizeName(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        return name.trim();
     }
 }

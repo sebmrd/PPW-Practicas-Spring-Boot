@@ -13,4 +13,6 @@ public interface ProductService {
     List<ProductResponseDto> findByUserId(Long userId);
     List<ProductResponseDto> findByCategoryId(Long categoryId);
     boolean validateName(String name);
+    List<ProductResponseDto> findByUserIdWithFilters(Long userId, ProductFilterByUserDto filters);
+    List<ProductResponseDto> findByCategoryIdWithFilters(Long categoryId, ProductFilterByCategoryDto filters);
 }
