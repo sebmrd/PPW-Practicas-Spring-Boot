@@ -1,9 +1,11 @@
 package ec.edu.ups.icc.fundamentos01.categories.entities;
 
 import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.*;
 
 /*
  * Entidad JPA del recurso categories.
@@ -21,6 +23,9 @@ public class CategoryEntity extends BaseEntity {
 
     @Column(length = 500)
     private String description;
+
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    private Set<ProductEntity> products = new HashSet<>();
 
     // Constructor vacío
     public CategoryEntity() {
@@ -47,5 +52,13 @@ public class CategoryEntity extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<ProductEntity> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<ProductEntity> products) {
+        this.products = products;
     }
 }

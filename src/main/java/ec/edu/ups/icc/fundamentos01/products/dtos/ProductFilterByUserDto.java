@@ -15,9 +15,6 @@ public class ProductFilterByUserDto {
     @DecimalMin(value = "0.0", inclusive = true, message = "El precio máximo no puede ser negativo")
     private Double maxPrice;
 
-    @Min(value = 1, message = "El ID de categoría debe ser mayor a 0")
-    private Long categoryId;
-
     public boolean hasValidPriceRange() {
         if (minPrice != null && maxPrice != null) {
             return maxPrice >= minPrice;
@@ -36,6 +33,4 @@ public class ProductFilterByUserDto {
     public void setMinPrice(Double minPrice) { this.minPrice = minPrice; }
     public Double getMaxPrice() { return maxPrice; }
     public void setMaxPrice(Double maxPrice) { this.maxPrice = maxPrice; }
-    public Long getCategoryId() { return categoryId; }
-    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
 }

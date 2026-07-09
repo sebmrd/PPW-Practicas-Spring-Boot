@@ -20,7 +20,7 @@ public class PartialUpdateProductDto {
     @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
 
-    private Long categoryId;
+    private java.util.Set<Long> categoryIds;
 
     // Constructor vacío
     public PartialUpdateProductDto() {
@@ -31,7 +31,8 @@ public class PartialUpdateProductDto {
         this.name = name;
         this.price = price;
         this.stock = stock;
-        this.categoryId = categoryId;
+        this.categoryIds = new java.util.HashSet<>();
+        this.categoryIds.add(categoryId);
     }
 
     // Getters y setters
@@ -59,11 +60,11 @@ public class PartialUpdateProductDto {
         this.stock = stock;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public java.util.Set<Long> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryIds(java.util.Set<Long> categoryIds) {
+        this.categoryIds = categoryIds;
     }
 }

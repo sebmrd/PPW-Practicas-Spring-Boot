@@ -64,12 +64,4 @@ public class CategoriesController {
     public void delete(@PathVariable("id") Long id) {
         service.delete(id);
     }
-
-    @GetMapping("/{id}/products")
-    public List<ProductResponseDto> findProductsByCategory(
-            @PathVariable("id") Long id,
-            @Valid @ModelAttribute ProductFilterByCategoryDto filters
-    ) {
-        return productService.findByCategoryIdWithFilters(id, filters);
-    }
 }

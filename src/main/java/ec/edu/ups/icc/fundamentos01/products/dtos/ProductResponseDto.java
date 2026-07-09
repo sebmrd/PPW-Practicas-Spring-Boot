@@ -21,7 +21,7 @@ public class ProductResponseDto {
     private Integer stock;
 
     private UserSummaryDto owner; 
-    private CategorySummaryDto category;
+    private java.util.List<CategorySummaryDto> categories;
 
     private LocalDateTime createdAt;
 
@@ -38,7 +38,8 @@ public class ProductResponseDto {
         this.price = price;
         this.stock = stock;
         this.owner = owner;
-        this.category = category;
+        this.categories = new java.util.ArrayList<>();
+        this.categories.add(category);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -64,8 +65,8 @@ public class ProductResponseDto {
         return owner;
     }
 
-    public CategorySummaryDto getCategory() {
-        return category;
+    public java.util.List<CategorySummaryDto> getCategories() {
+        return categories;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -96,8 +97,8 @@ public class ProductResponseDto {
         this.owner = owner;
     }
 
-    public void setCategory(CategorySummaryDto category) {
-        this.category = category;
+    public void setCategories(java.util.List<CategorySummaryDto> categories) {
+        this.categories = categories;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

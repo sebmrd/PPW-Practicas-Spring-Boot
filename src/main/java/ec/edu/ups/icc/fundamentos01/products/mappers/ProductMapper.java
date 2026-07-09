@@ -30,12 +30,17 @@ public class ProductMapper {
         }
 
         // Mapeo del objeto anidado Category (Categoría)
-        if (entity.getCategory() != null) {
-            ProductResponseDto.CategorySummaryDto categoryDto = new ProductResponseDto.CategorySummaryDto();
-            categoryDto.setId(entity.getCategory().getId());
-            categoryDto.setName(entity.getCategory().getName());
-            categoryDto.setDescription(entity.getCategory().getDescription());
-            dto.setCategory(categoryDto);
+        if (entity.getCategories() != null && !entity.getCategories().isEmpty()) {
+            List<ProductResponseDto.CategorySummaryDto> categoryDtos = entity.getCategories().stream()
+                .map(cat -> {
+                    ProductResponseDto.CategorySummaryDto catDto = new ProductResponseDto.CategorySummaryDto();
+                    catDto.setId(cat.getId());
+                    catDto.setName(cat.getName());
+                    catDto.setDescription(cat.getDescription());
+                    return catDto;
+                }).toList();
+                
+            dto.setCategories(categoryDtos);
         }
 
         return dto;

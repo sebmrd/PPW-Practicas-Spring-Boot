@@ -208,3 +208,39 @@ Se valida la entrada de datos a través de las anotaciones `@Valid` en los DTOs.
 ![Evidencia Datos Inválidos](assets/20_post_400.png)
 
 ---
+
+## Explicación de la Practica 08_relación_entidades
+
+
+
+---
+
+## Explicación de la Practica 09_relación_requestparam
+
+### ¿Por qué se usa ProductService y ProductRepository para consultar productos aunque el endpoint esté en UsersController o CategoriesController?
+
+Porque el contexto semántico de la URL (ej. /users/{id}/products) solo sirve para organizar la API de forma lógica para el cliente, pero el "recurso" principal que estamos consultando, filtrando y devolviendo sigue siendo un Producto. Delegar esta tarea al ProductRepository permite realizar consultas explícitas y eficientes a la base de datos (usando SQL con filtros WHERE y JOIN), en lugar de sobrecargar la memoria de la aplicación intentando navegar por las colecciones de un UserEntity o CategoryEntity mediante JPA.
+
+### ¿Qué cambió al pasar de Product N - 1 Category a Product N - N Category?
+
+1. Base de datos: Se eliminó la columna category_id de la tabla products y se generó una tabla intermedia automática llamada product_categories para almacenar los pares de IDs (producto - categoría).
+
+2. JPA: Se reemplazó la anotación @ManyToOne por @ManyToMany y @JoinTable, usando colecciones (Set<CategoryEntity>) en lugar de un objeto individual.
+
+3. Lógica de negocio y SQL: Se modificaron los DTOs para recibir arreglos de IDs (Set<Long> categoryIds). Además, las consultas en el repositorio pasaron de usar una simple igualdad (p.category.id = :id) a requerir un JOIN p.categories c acompañado de un SELECT DISTINCT p para evitar que la base de datos devuelva productos duplicados en el resultado.
+
+---
+
+## Explicación de la Practica 10_paginacion
+
+### ¿Cuál es la diferencia entre Page y Slice?
+
+Page ejecuta dos consultas SQL a la base de datos: una para traer los registros de la página actual y otra (COUNT) para calcular el total de elementos y páginas existentes. Esto lo hace ideal para tablas administrativas donde necesitas mostrar controles precisos (Ej: "Página 1 de 20").
+Slice, en cambio, es mucho más ligero porque no hace la consulta de conteo (COUNT). Solo trae los registros solicitados más uno adicional para saber si hay una "página siguiente" (hasNext). Es ideal para flujos rápidos como "Scroll Infinito" en aplicaciones móviles o web.
+
+### ¿Por qué la paginación debe aplicarse en el repositorio y no después de traer todos los datos a Java?
+
+Porque evita la sobrecarga de la memoria (RAM) del servidor y el colapso del ancho de banda. Si la tabla tiene 100,000 productos y paginamos en Java, estaríamos obligando a la base de datos a enviar los 100,000 registros completos a través de la red, para luego descartar 99,990 en memoria. Al aplicar la paginación en el repositorio, la base de datos procesa los comandos LIMIT y OFFSET a nivel de SQL, enviando únicamente los 10 registros que el cliente solicitó, lo que resulta en respuestas de milisegundos.
+
+---
+

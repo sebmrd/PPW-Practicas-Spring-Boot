@@ -3,12 +3,10 @@ package ec.edu.ups.icc.fundamentos01.products.entities;
 import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity;
 import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.*;
 
 /*
  * Entidad JPA del recurso products.
@@ -40,14 +38,17 @@ public class ProductEntity extends BaseEntity {
     private UserEntity owner;
 
     /*
-     * Relación muchos a uno con CategoryEntity.
-     *
-     * Muchos productos pueden pertenecer a una categoría.
-     * La columna category_id se crea en la tabla products.
+     * Relación muchos a muchos entre productos y categorías.
+     * Un producto puede pertenecer a varias categorías.
+     * Una categoría puede tener varios productos.
      */
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity category;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "product_categories",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<CategoryEntity> categories = new HashSet<>();
 
     // Constructor vacío
     public ProductEntity() {
@@ -59,7 +60,7 @@ public class ProductEntity extends BaseEntity {
         this.price = price;
         this.stock = stock;
         this.owner = owner;
-        this.category = category;
+        this.categories.add(category);
     }
 
     // Getters y setters
@@ -95,11 +96,11 @@ public class ProductEntity extends BaseEntity {
         this.owner = owner;
     }
 
-    public CategoryEntity getCategory() {
-        return category;
+    public Set<CategoryEntity> getCategories() {
+        return categories;
     }
 
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
+    public void setCategories(Set<CategoryEntity> categories) {
+        this.categories = categories;
     }
 }

@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.*;
 import ec.edu.ups.icc.fundamentos01.products.dtos.*;
 import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
+import ec.edu.ups.icc.fundamentos01.core.dto.PaginationDto;
 
 @RestController
 @RequestMapping("/products")
@@ -61,5 +64,15 @@ public class ProductsController {
         
         // Devolvemos un JSON estructurado de respuesta
         return java.util.Map.of("exists", exists);
+    }
+
+    @GetMapping("/page")
+    public Page<ProductResponseDto> findAllPage(@Valid @ModelAttribute PaginationDto pagination) {
+        return service.findAllPage(pagination);
+    }
+
+    @GetMapping("/slice")
+    public Slice<ProductResponseDto> findAllSlice(@Valid @ModelAttribute PaginationDto pagination) {
+        return service.findAllSlice(pagination);
     }
 }
