@@ -244,3 +244,30 @@ Porque evita la sobrecarga de la memoria (RAM) del servidor y el colapso del anc
 
 ---
 
+## Explicación de la Practica 11_autenticación_Autorización
+
+
+
+---
+
+## Explicación de la Practica 12_roles_preauthorize
+
+
+
+---
+
+## Explicación de la PRactica 13_ownership_validacion
+
+### ¿Qué es ownership?
+
+Es el concepto de propiedad de un recurso en el sistema. Significa vincular un registro específico (como un producto) a un usuario concreto, asegurando que por defecto solo su creador o dueño legítimo tenga los permisos necesarios para modificarlo o eliminarlo.
+
+### ¿Por qué no es seguro recibir userId en CreateProductDto?
+
+Porque un usuario malintencionado podría interceptar o manipular el cuerpo de la petición (el JSON) y enviar el ID de otro usuario. Esto le permitiría crear registros a nombre de terceros sin su consentimiento. Al extraer la identidad directamente del token JWT en el backend, garantizamos la integridad del autor.
+
+### ¿Cuál es la diferencia entre autorización por rol y autorización por ownership?
+
+La autorización por rol define qué tipo de acciones generales puede realizar un usuario (ej. un ADMIN puede ver la lista de todos los productos, un USER no). La autorización por ownership define sobre qué registros específicos puede actuar dentro de esas acciones permitidas (ej. un USER tiene permiso para editar productos, pero el ownership restringe esa acción exclusivamente a los productos que él mismo creó).
+
+---

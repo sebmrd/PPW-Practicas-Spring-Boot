@@ -78,7 +78,15 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Query("SELECT p FROM ProductEntity p WHERE p.deleted = false")
     Slice<ProductEntity> findActiveSlice(Pageable pageable);
 
-    /* Consultas por categoría paginadas (Con los filtros de la práctica 9) */
+
+    /* ========================================================================= */
+    /* NUEVOS MÉTODOS SOLICITADOS (PRACTICA)                                     */
+    /* ========================================================================= */
+
+    // 1. Método para el Slice filtrado por el dueño (Derivado por Spring Data, no requiere @Query)
+    Slice<ProductEntity> findByOwner_IdAndDeletedFalse(Long ownerId, Pageable pageable);
+
+    // 2. Método para Paginación con múltiples filtros (Reemplaza al que tenías repetido)
     @Query(
     value = """
         SELECT DISTINCT p FROM ProductEntity p JOIN p.categories c 
@@ -103,6 +111,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
         @Param("userId") Long userId, Pageable pageable
     );
 
+    // 3. Método para Slice con múltiples filtros (Solución al error del popup)
     @Query("""
         SELECT DISTINCT p FROM ProductEntity p JOIN p.categories c 
         WHERE p.deleted = false AND c.id = :categoryId AND c.deleted = false AND p.owner.deleted = false 
@@ -112,8 +121,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
         AND (:userId IS NULL OR p.owner.id = :userId)
     """)
     Slice<ProductEntity> findByCategoryIdWithFiltersSlice(
-            @Param("categoryId") Long categoryId, @Param("name") String name,
-            @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice,
-            @Param("userId") Long userId, Pageable pageable
+        @Param("categoryId") Long categoryId, @Param("name") String name,
+        @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice,
+        @Param("userId") Long userId, Pageable pageable
     );
 }

@@ -28,9 +28,6 @@ public class CreateProductDto {
     @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
 
-    @NotNull(message = "El ID del usuario es obligatorio")
-    private Long userId;
-
     @NotEmpty(message = "Debe seleccionar al menos una categoría")
     private java.util.Set<Long> categoryIds;
 
@@ -39,11 +36,10 @@ public class CreateProductDto {
     }
 
     // Constructor lleno
-    public CreateProductDto(String name, Double price, Integer stock, Long userId, Long categoryId) {
+    public CreateProductDto(String name, Double price, Integer stock, Long categoryId) {
         this.name = name;
         this.price = price;
         this.stock = stock;
-        this.userId = userId;
         this.categoryIds = new java.util.HashSet<>();
         this.categoryIds.add(categoryId);
     }
@@ -71,14 +67,6 @@ public class CreateProductDto {
 
     public void setStock(Integer stock) {
         this.stock = stock;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public java.util.Set<Long> getCategoryIds() {
