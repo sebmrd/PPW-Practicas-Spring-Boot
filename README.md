@@ -211,7 +211,21 @@ Se valida la entrada de datos a través de las anotaciones `@Valid` en los DTOs.
 
 ## Explicación de la Practica 08_relación_entidades
 
+### ¿Cómo se relaciona ProductEntity con UserEntity y CategoryEntity usando @ManyToOne y @JoinColumn?
 
+#### La Lógica de la Relación
+
+* **Muchos Productos, un Usuario:** Muchos productos (ProductEntity) pueden ser creados, vendidos o gestionados por un mismo usuario (UserEntity).
+
+* **Muchos Productos, una Categoría:** Muchos productos (ProductEntity) pertenecen a una sola categoría (CategoryEntity).
+
+En este escenario, ProductEntity es la entidad dueña de la relación, lo que significa que su tabla correspondiente en la base de datos contendrá las columnas de clave foránea (FK).
+
+#### ¿Qué hace cada anotación?
+
+* **@ManyToOne:** Le dice a JPA que la entidad actual (ProductEntity) tiene una relación de muchos a uno con el tipo de dato del campo (ej. UserEntity).
+
+* **@JoinColumn(name = "..."):** Define el nombre de la columna física de la clave foránea (Foreign Key) que se creará en la tabla de productos para almacenar el ID del usuario o de la categoría.
 
 ---
 
@@ -246,13 +260,71 @@ Porque evita la sobrecarga de la memoria (RAM) del servidor y el colapso del anc
 
 ## Explicación de la Practica 11_autenticación_Autorización
 
+### Conceptos Fundamentales
 
+* **Autenticación:** Es el proceso de verificar la identidad del usuario (¿Quién eres?). Por ejemplo, cuando el usuario ingresa su usuario y contraseña.
+
+* **Autorización:** Es el proceso de verificar a qué recursos tiene acceso el usuario autenticado (¿Qué tienes permitido hacer?). Por ejemplo, determinar si un usuario es ROLE_USER o ROLE_ADMIN.
+
+* **JWT (JSON Web Token):** Es un token compacto y seguro para URL que contiene información (claims) sobre el usuario. Al ser firmado digitalmente (usando una clave secreta), el servidor puede confiar en su autenticidad sin necesidad de guardar una sesión en la base de datos.
+
+### 2. El Flujo de Trabajo (Workflow)
+
+El control de acceso con JWT sigue un flujo simple de 4 pasos:
+
+1. **Inicio de sesión:** El cliente (frontend) envía sus credenciales (usuario/password) en una petición POST.
+
+2. **Generación del Token:** Spring Security valida las credenciales. Si son correctas, genera un JWT firmado con una clave secreta y lo devuelve al cliente.
+
+3. **Peticiones Protegidas:** Para cualquier consulta posterior (ej. ver el perfil o crear un producto), el cliente envía el JWT en la cabecera HTTP de la petición: Authorization: Bearer <token>.
+
+4. **Validación y Acceso:** Spring Boot intercepta la petición, valida la firma del token, extrae los roles/permisos del usuario y le permite (o deniega) el acceso.
+
+### Componentes Clave en Spring Boot
+
+Para implementar esto, se configuran principalmente tres elementos en el código:
+
+* **SecurityFilterChain (Configuración):** Es la clase donde defines qué rutas son públicas (como /login o /register) y cuáles requieren autenticación o roles específicos.
+
+* **JwtFilter (Filtro Personalizado):** Un interceptor que se ejecuta en cada petición para extraer el token de la cabecera, verificar que no haya expirado y cargar el contexto de seguridad si el token es válido.
+
+* **JwtProvider / JwtUtils (Utilidades):** La clase encargada de crear el token (definiendo el tiempo de expiración y los claims) y de parsearlo/validarlo cuando regresa.
+
+### ¿Por qué se usa? (Ventajas)
+
+* **Stateless (Sin estado):** El servidor no guarda sesiones en memoria, lo que hace que la aplicación sea altamente escalable y perfecta para arquitecturas de microservicios.
+
+* **Separación Frontend/Backend:** Ideal para conectar con aplicaciones de React, Angular, Vue o apps móviles.
 
 ---
 
 ## Explicación de la Practica 12_roles_preauthorize
 
+En Spring Boot, una vez que el usuario está autenticado (por ejemplo, mediante el JWT que vimos antes), el siguiente paso es controlar qué acciones específicas puede realizar. Aquí es donde entran en juego los Roles y la anotación @PreAuthorize.
 
+Esta combinación permite implementar un Control de Acceso Basado en Roles (RBAC) de forma elegante y directamente sobre los métodos de tu código.
+
+### Roles vs. Autoridades (GrantedAuthority)
+
+En Spring Security, los permisos se manejan bajo el concepto genérico de "Autoridades". Sin embargo, hay una distinción clave en la práctica:
+
+* **Roles:** Representan un grupo de permisos de alto nivel (ej. ADMIN, USER, MANAGER). Por convención en Spring Security, los roles en la base de datos o en el token deben llevar el prefijo ROLE_ (por ejemplo, ROLE_ADMIN).
+
+* **Privilegios/Permisos:** Son acciones atómicas y específicas (ej. READ_PRIVILEGE, WRITE_PRIVILEGE).
+
+### ¿Qué es @PreAuthorize?
+
+Es una anotación de Spring Security que se coloca justo encima de los métodos de tus Controllers o Services. Permite definir expresiones lógicas (usando SpEL - Spring Expression Language) que se evalúan antes de que el método se ejecute. Si el usuario no cumple con la condición, Spring bloquea la ejecución y lanza una excepción de acceso denegado (403 Forbidden).
+
+Para poder usarla, primero debes activar la seguridad por método en tu clase de configuración con @EnableMethodSecurity.
+
+### Ventajas de este Enfoque
+
+* **Seguridad Declarativa:** No llenas tu lógica de negocio con condicionales if (usuario.hasRole(...)). La seguridad se declara de forma limpia arriba del método.
+
+* **Granularidad Fina:** Puedes proteger rutas enteras desde la configuración global, pero @PreAuthorize te permite asegurar métodos específicos dentro de una misma clase.
+
+* **Flexibilidad:** Además de hasRole(), puedes usar expresiones como hasAuthority('PERMISO_ESCRITURA') o incluso validar si el usuario que hace la petición es el mismo dueño del recurso (ej. @PreAuthorize("#username == authentication.principal.username")).
 
 ---
 
