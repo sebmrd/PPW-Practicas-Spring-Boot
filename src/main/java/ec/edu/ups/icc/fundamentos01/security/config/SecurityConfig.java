@@ -63,13 +63,15 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 // Endpoints públicos
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/status/**").permitAll()
+                .requestMatchers("/auth/**").permitAll() 
+                .requestMatchers("/status/**").permitAll() 
+                .requestMatchers("/actuator/health").permitAll()
                 
-                // Endpoints por rol
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
-                
+                // Endpoints por rol (¡Sin el /api al principio!)
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
+
                 // Resto requiere autenticación
                 .anyRequest().authenticated()
             )

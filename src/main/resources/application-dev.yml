@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devdb
+    username: ups
+    password: ups123
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+logging:
+  level:
+    ec.edu.ups.pwp67: DEBUG
+jwt:
+  header: Authorization
+  prefix: "Bearer "
+  secret: dev-secret-not-for-production-min-256-bits
+  expiration: 3600000

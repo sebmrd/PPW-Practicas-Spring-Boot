@@ -343,3 +343,33 @@ Porque un usuario malintencionado podría interceptar o manipular el cuerpo de l
 La autorización por rol define qué tipo de acciones generales puede realizar un usuario (ej. un ADMIN puede ver la lista de todos los productos, un USER no). La autorización por ownership define sobre qué registros específicos puede actuar dentro de esas acciones permitidas (ej. un USER tiene permiso para editar productos, pero el ownership restringe esa acción exclusivamente a los productos que él mismo creó).
 
 ---
+
+## Explicación de la Practica 14_despliegue_produccion
+
+### Preparación de la API para Producción
+
+Antes de subir el código a un servidor, debes "vestir de gala" tu aplicación Spring Boot. Esto incluye:
+
+* **Perfiles de Spring (Profiles):** No usas la misma base de datos en tu computadora (desarrollo) que en el servidor real (producción). Usas perfiles como application-dev.properties y application-prod.properties para separar estas configuraciones de forma automática.
+
+* **Gestión de Variables de Entorno:** Las contraseñas de la base de datos o las llaves de APIs externas nunca se dejan escritas en el código. Se configuran como variables de entorno en el servidor por seguridad.
+
+* **Monitoreo con Spring Boot Actuator:** Una dependencia clave que expone "endpoints" (rutas) para revisar la salud de la aplicación (/actuator/health), ver el consumo de memoria y asegurarse de que todo corra bien.
+
+### Empaquetado de la Aplicación
+
+Spring Boot facilita enormemente este paso gracias a su concepto de Fat JAR (o JAR ejecutable).
+
+A diferencia de Java tradicional donde necesitabas instalar un servidor como Tomcat por separado, Spring Boot compila todo tu código, tus dependencias y un servidor Tomcat embebido dentro de un único archivo .jar.
+
+* Para generarlo, usualmente ejecutas comandos como ./gradlew build (si usas Gradle).
+
+### Estrategias de Despliegue (Dónde y cómo corre)
+
+Una vez que tienes tu archivo .jar, hay varias formas de ponerlo en producción:
+
+* **Despliegue Tradicional (VPS/IaaS):** Subes el .jar a un servidor en la nube (como AWS EC2 o DigitalOcean) mediante SSH y lo ejecutas con el comando java -jar tu-aplicacion.jar.
+
+* **Contenedores con Docker:** Metes el .jar dentro de un contenedor Docker. Esto asegura que la aplicación corra exactamente igual en cualquier servidor del mundo, resolviendo problemas de compatibilidad de software.
+
+* **Plataformas como Servicio (PaaS):** Usar servicios que te quitan el dolor de cabeza de administrar servidores (como Railway, Render, AWS Elastic Beanstalk o Heroku). Tú solo subes el código o el JAR, y ellos se encargan del resto.

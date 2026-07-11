@@ -1,0 +1,9 @@
+build/
+.gradle/
+.git/
+.idea/
+*.iml
+README.md
+.env
+gradle-app.setting
+.gradletasknamecache
