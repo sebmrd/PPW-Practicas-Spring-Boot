@@ -31,6 +31,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 }
 
 springBoot {
