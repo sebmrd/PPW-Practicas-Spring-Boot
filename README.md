@@ -384,15 +384,43 @@ Una vez que tienes tu archivo .jar, hay varias formas de ponerlo en producción:
 
 * **Refresh Token:** Es la "llave maestra" para renovar el acceso. Es un token de larga duración (días o semanas) que no se envía a la API para consumir datos, sino que se usa exclusivamente ante el servidor de autenticación para pedir un nuevo Access Token cuando el anterior expira.
 
-## ¿Por qué el Refresh Token no debe usarse en Authorization: Bearer?
+### ¿Por qué el Refresh Token no debe usarse en Authorization: Bearer?
 
 El encabezado Authorization: Bearer está expuesto en la red en casi todas las peticiones que hace tu aplicación, lo que aumenta drásticamente el riesgo de que sea interceptado (por ejemplo, a través de ataques Man-in-the-Middle o registros de servidores).
 
 Si expones el Refresh Token ahí, un atacante que lo robe tendría control total y de largo plazo sobre la cuenta de la víctima. El Refresh Token debe guardarse de forma ultra segura (como una cookie HttpOnly y Secure) y viajar solo al endpoint específico de renovación (/refresh o /token), nunca en las rutas comunes de la API.
 
-## ¿Qué significa rotar un Refresh Token?
+### ¿Qué significa rotar un Refresh Token?
 
 La rotación de Refresh Tokens (Refresh Token Rotation) es una medida de seguridad avanzada. Significa que cada vez que usas un Refresh Token para pedir un nuevo Access Token, el servidor invalida ese Refresh Token viejo y te devuelve uno nuevo.
 
 **¿Por qué se hace?** Si un atacante roba un Refresh Token e intenta usarlo, el servidor detectará que ese token ya se usó (o que el usuario legítimo intentó usar uno viejo) e inmediatamente invalidará toda la sesión y todos los tokens asociados, mitigando el robo de inmediato.
 
+---
+
+## Explicación breve de la Practica: 15_swagger
+
+### Diferencia entre Swagger UI y OpenAPI
+
+* **OpenAPI** es la especificación o el estándar. Es un documento escrito en un formato estructurado (como YAML o JSON) que describe de manera teórica cómo funciona tu API: qué rutas existen, qué datos reciben, qué errores pueden devolver y qué tipo de seguridad utilizan. Es el plano arquitectónico.
+
+* **Swagger UI** es la herramienta visual y el entorno gráfico. Toma ese plano arquitectónico (el archivo OpenAPI) y lo transforma en una página web interactiva y bonita. Permite a los desarrolladores humanos leer la documentación fácilmente y hacer pruebas en tiempo real haciendo clic en botones en lugar de usar la terminal.
+
+### Por qué Swagger puede ser público pero los endpoints siguen protegidos
+
+Existe una diferencia total entre ver el mapa de una API y tener la llave para entrar a las habitaciones.
+
+Cuando dejas Swagger UI público, solo estás exponiendo la documentación (el mapa). Cualquier persona puede ver que existe un endpoint llamado /usuarios/eliminar y que requiere un ID. Sin embargo, cuando alguien intenta presionar el botón para ejecutar esa acción, la petición viaja desde el navegador hacia el servidor real de tu aplicación.
+
+Como el servidor es el que tiene la lógica de seguridad, intercepta la petición, busca las credenciales (el token) y, al no encontrarlas o ver que son inválidas, rechaza la operación devolviendo un código de error de acceso denegado (401 Unauthorized). Swagger no se salta las reglas del servidor; solo las muestra.
+
+### ¿Cómo se configura Swagger para enviar un JWT en Authorization: Bearer?
+
+Para que Swagger UI entienda que tu API requiere un token y te permita enviarlo en las pruebas, se deben seguir dos pasos conceptuales en su configuración:
+
+1. **Definir el Esquema de Seguridad (El "Contenedor"):** Le indicas a Swagger que la API utiliza un método de autenticación de tipo HTTP, específicamente bajo el esquema llamado "bearer" y que el formato esperado es un JWT. Al hacer esto, Swagger UI habilitará un botón global llamado "Authorize" (un icono de un candado) en la parte superior de la página.
+
+2. **Aplicar el Requisito de Seguridad (El "Bloqueo"):** Le indicas a Swagger si este esquema se aplica a toda la API en general o solo a ciertos endpoints específicos. Al hacer esto, aparecerá un pequeño candado cerrado o abierto al lado de cada ruta en la interfaz.
+
+**¿Cómo funciona para el usuario?**
+Una vez configurado, el desarrollador hace clic en el botón "Authorize", pega su token JWT directamente en el cuadro de texto y cierra la ventana flotante. A partir de ese momento, cada vez que el usuario presione el botón "Try it out" (Probar) en cualquier endpoint, Swagger UI inyectará de forma automática e invisible la cabecera Authorization con el valor Bearer <token> en la petición antes de enviarla al servidor.

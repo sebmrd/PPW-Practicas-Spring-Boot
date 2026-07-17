@@ -66,8 +66,13 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll() 
                 .requestMatchers("/status/**").permitAll() 
                 .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
+                ).permitAll()
                 
-                // Endpoints por rol (¡Sin el /api al principio!)
+                // Endpoints por rol
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
                 .requestMatchers("/actuator/**").hasRole("ADMIN")
