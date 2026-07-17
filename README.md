@@ -373,3 +373,26 @@ Una vez que tienes tu archivo .jar, hay varias formas de ponerlo en producción:
 * **Contenedores con Docker:** Metes el .jar dentro de un contenedor Docker. Esto asegura que la aplicación corra exactamente igual en cualquier servidor del mundo, resolviendo problemas de compatibilidad de software.
 
 * **Plataformas como Servicio (PaaS):** Usar servicios que te quitan el dolor de cabeza de administrar servidores (como Railway, Render, AWS Elastic Beanstalk o Heroku). Tú solo subes el código o el JAR, y ellos se encargan del resto.
+
+---
+
+## Explicación de la Practica: 14_refresh_toekn_pt2
+
+### ¿Cuál es la diferencia entre Access Token y Refresh Token?
+
+* **Access Token:** Es la "llave de acceso". Es un token de corta duración (minutos u horas) que se envía en cada petición para demostrar que estás autenticado y tienes permiso de usar la API.
+
+* **Refresh Token:** Es la "llave maestra" para renovar el acceso. Es un token de larga duración (días o semanas) que no se envía a la API para consumir datos, sino que se usa exclusivamente ante el servidor de autenticación para pedir un nuevo Access Token cuando el anterior expira.
+
+## ¿Por qué el Refresh Token no debe usarse en Authorization: Bearer?
+
+El encabezado Authorization: Bearer está expuesto en la red en casi todas las peticiones que hace tu aplicación, lo que aumenta drásticamente el riesgo de que sea interceptado (por ejemplo, a través de ataques Man-in-the-Middle o registros de servidores).
+
+Si expones el Refresh Token ahí, un atacante que lo robe tendría control total y de largo plazo sobre la cuenta de la víctima. El Refresh Token debe guardarse de forma ultra segura (como una cookie HttpOnly y Secure) y viajar solo al endpoint específico de renovación (/refresh o /token), nunca en las rutas comunes de la API.
+
+## ¿Qué significa rotar un Refresh Token?
+
+La rotación de Refresh Tokens (Refresh Token Rotation) es una medida de seguridad avanzada. Significa que cada vez que usas un Refresh Token para pedir un nuevo Access Token, el servidor invalida ese Refresh Token viejo y te devuelve uno nuevo.
+
+**¿Por qué se hace?** Si un atacante roba un Refresh Token e intenta usarlo, el servidor detectará que ese token ya se usó (o que el usuario legítimo intentó usar uno viejo) e inmediatamente invalidará toda la sesión y todos los tokens asociados, mitigando el robo de inmediato.
+

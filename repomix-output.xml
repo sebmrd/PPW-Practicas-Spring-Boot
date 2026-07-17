@@ -1,0 +1,5637 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+assets/
+  01-java-version.png
+  02-servidor-ejecutando.png
+  03-respuesta.png
+  04-existencia_java.png
+  05-estructura.png
+  06-Java.png
+  07-árbol.png
+  08_get_products.png
+  09_delete_product.png
+  10_get_product.png
+  11_delete_product_noexits.png
+  12_product_services.png
+  13_product_services.png
+  14_product_controllers.png
+  15_lista.png
+  16_post_novalid.png
+  17_post_valid.png
+  18_put_deleted.png
+  19_post_409.png
+  20_post_400.png
+  21_get_404.png
+files/
+  seed_data.sql
+  verifitacion_data.sql
+gradle/
+  wrapper/
+    gradle-wrapper.jar
+    gradle-wrapper.properties
+src/
+  main/
+    java/
+      ec/
+        edu/
+          ups/
+            icc/
+              fundamentos01/
+                categories/
+                  controllers/
+                    CategoriesController.java
+                    CategoryProductsController.java
+                  dtos/
+                    CategoryResponseDto.java
+                    CreateCategoryDto.java
+                    UpdateCategoryDto.java
+                  entities/
+                    CategoryEntity.java
+                  repositories/
+                    CategoryRepository.java
+                  services/
+                    CategoryService.java
+                    CategoryServiceImpl.java
+                core/
+                  controllers/
+                    StatusController.java
+                  dto/
+                    ErrorResponseDto.java
+                    PaginationDto.java
+                  entities/
+                    BaseEntity.java
+                  exceptions/
+                    base/
+                      ApplicationException.java
+                    domain/
+                      BadRequestException.java
+                      ConflictException.java
+                      NotFoundException.java
+                    handler/
+                      GlobalExceptionHandler.java
+                    response/
+                      ErrorResponse.java
+                products/
+                  controllers/
+                    ProductsController.java
+                  dtos/
+                    CreateProductDto.java
+                    PartialUpdateProductDto.java
+                    ProductFilterByCategoryDto.java
+                    ProductFilterByUserDto.java
+                    ProductResponseDto.java
+                    UpdateProductDto.java
+                  entities/
+                    ProductEntity.java
+                  mappers/
+                    ProductMapper.java
+                  models/
+                    Product.java
+                  repositories/
+                    ProductRepository.java
+                  services/
+                    ProductService.java
+                    ProductServiceImpl.java
+                security/
+                  config/
+                    JacksonConfig.java
+                    JwtProperties.java
+                    SecurityConfig.java
+                    SecurityDataInitializer.java
+                  controllers/
+                    AuthController.java
+                  dtos/
+                    AuthResponseDto.java
+                    LoginRequestDto.java
+                    RegisterRequestDto.java
+                  entities/
+                    RoleEntity.java
+                  enums/
+                    RoleName.java
+                  filters/
+                    JwtAuthenticationEntryPoint.java
+                    JwtAuthenticationFilter.java
+                  repositories/
+                    RoleRepository.java
+                  services/
+                    AuthService.java
+                    UserDetailsImpl.java
+                    UserDetailsServiceImpl.java
+                  utils/
+                    JwtUtil.java
+                students/
+                  controllers/
+                    StudentController.java
+                  models/
+                    Student.java
+                users/
+                  controllers/
+                    UserProductsController.java
+                    UsersController.java
+                  dtos/
+                    CreateUserDto.java
+                    PartialUpdateUserDto.java
+                    UpdateUserDto.java
+                    UserResponseDto.java
+                  entity/
+                    UserEntity.java
+                  mappers/
+                    UserMapper.java
+                  models/
+                    UserModel.java
+                  repository/
+                    UserRepository.java
+                  services/
+                    UserService.java
+                    UserServiceImpl.java
+                Fundamentos01Application.java
+    resources/
+      application-dev.yml
+      application-prod.yml
+      application.yml
+  test/
+    java/
+      ec/
+        edu/
+          ups/
+            icc/
+              fundamentos01/
+                Fundamentos01ApplicationTests.java
+.dockerignore
+.gitattributes
+.gitignore
+build.gradle.kts
+docker-compose.yml
+Dockerfile
+gradlew
+gradlew.bat
+README.md
+render.yaml
+settings.gradle.kts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="files/seed_data.sql">
+BEGIN;
+
+-- Limpieza previa
+
+TRUNCATE TABLE product_categories RESTART IDENTITY CASCADE;
+TRUNCATE TABLE products RESTART IDENTITY CASCADE;
+TRUNCATE TABLE categories RESTART IDENTITY CASCADE;
+TRUNCATE TABLE users RESTART IDENTITY CASCADE;
+
+-- =========================
+-- 1. Crear 10 usuarios
+-- =========================
+
+INSERT INTO users (
+    name,
+    email,
+    password_hash,
+    created_at,
+    updated_at,
+    deleted
+)
+SELECT
+    'Usuario ' || gs,
+    'usuario' || gs || '@ups.edu.ec',
+    'HASH_12345678',
+    NOW(),
+    NOW(),
+    false
+FROM generate_series(1, 10) AS gs;
+
+-- =========================
+-- 2. Crear 10 categorías
+-- =========================
+
+INSERT INTO categories (
+    name,
+    description,
+    created_at,
+    updated_at,
+    deleted
+)
+VALUES
+('Electrónicos', 'Productos electrónicos', NOW(), NOW(), false),
+('Gaming', 'Productos para videojuegos', NOW(), NOW(), false),
+('Oficina', 'Productos para oficina', NOW(), NOW(), false),
+('Libros', 'Libros y material académico', NOW(), NOW(), false),
+('Programación', 'Material relacionado con desarrollo de software', NOW(), NOW(), false),
+('Educación', 'Productos educativos', NOW(), NOW(), false),
+('Accesorios', 'Accesorios tecnológicos', NOW(), NOW(), false),
+('Diseño', 'Productos para diseño gráfico', NOW(), NOW(), false),
+('Redes', 'Equipos y accesorios de redes', NOW(), NOW(), false),
+('Audio', 'Dispositivos de audio', NOW(), NOW(), false);
+
+-- =========================
+-- 3. Crear 20 000 productos
+-- =========================
+
+INSERT INTO products (
+    name,
+    price,
+    stock,
+    user_id,
+    created_at,
+    updated_at,
+    deleted
+)
+SELECT
+    'Producto ' || LPAD(gs::text, 5, '0'),
+    ROUND((10 + random() * 4990)::numeric, 2),
+    FLOOR(random() * 101)::int,
+    (
+        SELECT u.id
+        FROM users u
+        WHERE u.deleted = false
+        ORDER BY random() + gs * 0
+        LIMIT 1
+    ),
+    NOW(),
+    NOW(),
+    false
+FROM generate_series(1, 20000) AS gs;
+
+-- =========================
+-- 4. Asociar 2 o 3 categorías por producto
+-- =========================
+
+INSERT INTO product_categories (
+    product_id,
+    category_id
+)
+SELECT
+    p.id,
+    c.id
+FROM products p
+CROSS JOIN LATERAL (
+    SELECT ce.id
+    FROM categories ce
+    WHERE ce.deleted = false
+    ORDER BY random() + p.id * 0
+    LIMIT (2 + FLOOR(random() * 2))::int
+) c;
+
+COMMIT;
+</file>
+
+<file path="files/verifitacion_data.sql">
+-- =========================
+-- 5. Verificación
+-- =========================
+
+select count(*) as total_users
+  from users;
+
+select count(*) as total_categories
+  from category_entity;
+
+select count(*) as total_products
+  from products;
+
+select count(*) as total_product_category_relations
+  from product_categories;
+
+select min(total_categories) as min_categories_per_product,
+       max(total_categories) as max_categories_per_product,
+       round(
+          avg(total_categories),
+          2
+       ) as avg_categories_per_product
+  from (
+   select product_id,
+          count(*) as total_categories
+     from product_categories
+    group by product_id
+) t;
+</file>
+
+<file path="gradle/wrapper/gradle-wrapper.properties">
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.5.1-bin.zip
+networkTimeout=10000
+retries=0
+retryBackOffMs=500
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/controllers/CategoryProductsController.java">
+package ec.edu.ups.icc.fundamentos01.categories.controllers;
+
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductFilterByCategoryDto;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
+import ec.edu.ups.icc.fundamentos01.core.dto.PaginationDto;
+
+@RestController
+@RequestMapping("/categories")
+public class CategoryProductsController {
+
+    private final ProductService productService;
+
+    public CategoryProductsController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping("/{id}/products")
+    public List<ProductResponseDto> findProductsByCategory(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute ProductFilterByCategoryDto filters
+    ) {
+        return productService.findByCategoryIdWithFilters(id, filters);
+    }
+
+    @GetMapping("/{id}/products/page")
+    public Page<ProductResponseDto> findProductsByCategoryPage(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute ProductFilterByCategoryDto filters,
+            @Valid @ModelAttribute PaginationDto pagination
+    ) {
+        return productService.findByCategoryIdWithFiltersPage(id, filters, pagination);
+    }
+
+    @GetMapping("/{id}/products/slice")
+    public Slice<ProductResponseDto> findProductsByCategorySlice(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute ProductFilterByCategoryDto filters,
+            @Valid @ModelAttribute PaginationDto pagination
+    ) {
+        return productService.findByCategoryIdWithFiltersSlice(id, filters, pagination);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/dtos/CategoryResponseDto.java">
+package ec.edu.ups.icc.fundamentos01.categories.dtos;
+
+/*
+ * DTO utilizado para devolver los datos públicos
+ * de una categoría.
+ */
+public class CategoryResponseDto {
+
+    private Long id;
+
+    private String name;
+
+    private String description;
+
+    // Constructor vacío
+    public CategoryResponseDto() {
+    }
+
+    // Constructor lleno
+    public CategoryResponseDto(Long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/dtos/CreateCategoryDto.java">
+package ec.edu.ups.icc.fundamentos01.categories.dtos;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para recibir los datos necesarios
+ * para crear una categoría.
+ */
+public class CreateCategoryDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 120, message = "El nombre debe tener entre 3 y 120 caracteres")
+    private String name;
+
+    @Size(max = 500, message = "La descripción no debe superar los 500 caracteres")
+    private String description;
+
+    // Constructor vacío
+    public CreateCategoryDto() {
+    }
+
+    // Constructor lleno
+    public CreateCategoryDto(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/dtos/UpdateCategoryDto.java">
+package ec.edu.ups.icc.fundamentos01.categories.dtos;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para actualizar completamente una categoría.
+ */
+public class UpdateCategoryDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 120, message = "El nombre debe tener entre 3 y 120 caracteres")
+    private String name;
+
+    @Size(max = 500, message = "La descripción no debe superar los 500 caracteres")
+    private String description;
+
+    // Constructor vacío
+    public UpdateCategoryDto() {
+    }
+
+    // Constructor lleno
+    public UpdateCategoryDto(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/repositories/CategoryRepository.java">
+package ec.edu.ups.icc.fundamentos01.categories.repositories;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
+
+/*
+ * Repositorio encargado de gestionar la persistencia
+ * de categorías usando Spring Data JPA.
+ */
+@Repository
+public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+
+    Optional<CategoryEntity> findByNameIgnoreCaseAndDeletedFalse(String name);
+
+    boolean existsByNameIgnoreCaseAndDeletedFalse(String name);
+
+    boolean existsByIdAndDeletedFalse(Long id);
+
+    List<CategoryEntity> findByDeletedFalse();
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/services/CategoryService.java">
+package ec.edu.ups.icc.fundamentos01.categories.services;
+
+import java.util.List;
+
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoryResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CreateCategoryDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.UpdateCategoryDto;
+
+/*
+ * Servicio que define las operaciones disponibles
+ * para la gestión de categorías.
+ */
+public interface CategoryService {
+
+    List<CategoryResponseDto> findAll();
+
+    CategoryResponseDto findOne(Long id);
+
+    CategoryResponseDto create(CreateCategoryDto dto);
+
+    CategoryResponseDto update(Long id, UpdateCategoryDto dto);
+
+    void delete(Long id);
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/services/CategoryServiceImpl.java">
+package ec.edu.ups.icc.fundamentos01.categories.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoryResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CreateCategoryDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.UpdateCategoryDto;
+import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
+import ec.edu.ups.icc.fundamentos01.categories.repositories.CategoryRepository;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.ConflictException;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.NotFoundException;
+
+/*
+ * Implementación del servicio de categorías.
+ *
+ * Usa CategoryRepository para persistir datos en PostgreSQL.
+ */
+@Service
+public class CategoryServiceImpl implements CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    @Override
+    public List<CategoryResponseDto> findAll() {
+        return categoryRepository.findByDeletedFalse()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    public CategoryResponseDto findOne(Long id) {
+        CategoryEntity entity = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("Category not found");
+        }
+
+        return toResponse(entity);
+    }
+
+    @Override
+    public CategoryResponseDto create(CreateCategoryDto dto) {
+
+        if (categoryRepository.existsByNameIgnoreCaseAndDeletedFalse(dto.getName())) {
+            throw new ConflictException("Category name already registered");
+        }
+
+        CategoryEntity entity = new CategoryEntity();
+
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+
+        CategoryEntity saved = categoryRepository.save(entity);
+
+        return toResponse(saved);
+    }
+
+    @Override
+    public CategoryResponseDto update(Long id, UpdateCategoryDto dto) {
+        CategoryEntity entity = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("Category not found");
+        }
+
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+
+        CategoryEntity saved = categoryRepository.save(entity);
+
+        return toResponse(saved);
+    }
+
+    @Override
+    public void delete(Long id) {
+        CategoryEntity entity = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("Category not found");
+        }
+
+        entity.setDeleted(true);
+
+        categoryRepository.save(entity);
+    }
+
+
+    /// Este método es privado porque solo se utiliza dentro de esta clase
+    //  para convertir una entidad de categoría en un DTO de respuesta. 
+    //  Puede estar en una clase Mapper
+    private CategoryResponseDto toResponse(CategoryEntity entity) {
+        CategoryResponseDto dto = new CategoryResponseDto();
+
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+
+        return dto;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/controllers/StatusController.java">
+package ec.edu.ups.icc.fundamentos01.core.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@RestController
+public class StatusController {
+
+    @GetMapping("/api/status")
+    public Map<String, Object> status() {
+        return Map.of(
+                "service", "Spring Boot API",
+                "status", "running",
+                "timestamp", LocalDateTime.now().toString()
+        );
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/dto/ErrorResponseDto.java">
+package ec.edu.ups.icc.fundamentos01.core.dto;
+
+public class ErrorResponseDto {
+    private String message;
+
+    public ErrorResponseDto(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/dto/PaginationDto.java">
+package ec.edu.ups.icc.fundamentos01.core.dto;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
+public class PaginationDto {
+
+    @Min(value = 0, message = "La página debe ser mayor o igual a 0")
+    private int page = 0;
+
+    @Min(value = 1, message = "El tamaño debe ser mayor o igual a 1")
+    @Max(value = 100, message = "El tamaño no debe superar 100 registros")
+    private int size = 10;
+
+    private String sortBy = "id";
+    private String direction = "asc";
+
+    public PaginationDto() {}
+
+    public int getPage() { return page; }
+    public void setPage(int page) { this.page = page; }
+    public int getSize() { return size; }
+    public void setSize(int size) { this.size = size; }
+    public String getSortBy() { return sortBy; }
+    public void setSortBy(String sortBy) { this.sortBy = sortBy; }
+    public String getDirection() { return direction; }
+    public void setDirection(String direction) { this.direction = direction; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/entities/BaseEntity.java">
+package ec.edu.ups.icc.fundamentos01.core.entities;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
+/*
+ * Superclase base para entidades JPA.
+ *
+ * Contiene campos comunes de persistencia como id,
+ * createdAt, updatedAt y deleted.
+ *
+ * No genera una tabla propia.
+ * Sus atributos se heredan en las entidades hijas.
+ */
+@MappedSuperclass
+public abstract class BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    private boolean deleted;
+
+    @PrePersist
+    protected void onCreate() {
+        this.deleted = false;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Constructor vacío
+    public BaseEntity() {
+    }
+
+    // Getters y setters
+    // Getters y setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/base/ApplicationException.java">
+package ec.edu.ups.icc.fundamentos01.core.exceptions.base;
+
+import org.springframework.http.HttpStatus;
+
+public abstract class ApplicationException extends RuntimeException {
+    private final HttpStatus status;
+
+    protected ApplicationException(HttpStatus status, String message) {
+        super(message);
+        this.status = status;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/domain/BadRequestException.java">
+// Archivo: BadRequestException.java
+package ec.edu.ups.icc.fundamentos01.core.exceptions.domain;
+
+import ec.edu.ups.icc.fundamentos01.core.exceptions.base.ApplicationException;
+import org.springframework.http.HttpStatus;
+
+public class BadRequestException extends ApplicationException {
+    public BadRequestException(String message) {
+        super(HttpStatus.BAD_REQUEST, message);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/domain/ConflictException.java">
+// Archivo: ConflictException.java
+package ec.edu.ups.icc.fundamentos01.core.exceptions.domain;
+
+import ec.edu.ups.icc.fundamentos01.core.exceptions.base.ApplicationException;
+import org.springframework.http.HttpStatus;
+
+public class ConflictException extends ApplicationException {
+    public ConflictException(String message) {
+        super(HttpStatus.CONFLICT, message);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/domain/NotFoundException.java">
+// Archivo: NotFoundException.java
+package ec.edu.ups.icc.fundamentos01.core.exceptions.domain;
+
+import ec.edu.ups.icc.fundamentos01.core.exceptions.base.ApplicationException;
+import org.springframework.http.HttpStatus;
+
+public class NotFoundException extends ApplicationException {
+    public NotFoundException(String message) {
+        super(HttpStatus.NOT_FOUND, message);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/response/ErrorResponse.java">
+package ec.edu.ups.icc.fundamentos01.core.exceptions.response;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ErrorResponse {
+    private LocalDateTime timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    private Map<String, String> details;
+
+    public ErrorResponse(HttpStatus status, String message, String path, Map<String, String> details) {
+        this.timestamp = LocalDateTime.now();
+        this.status = status.value();
+        this.error = status.getReasonPhrase();
+        this.message = message;
+        this.path = path;
+        this.details = details;
+    }
+
+    public ErrorResponse(HttpStatus status, String message, String path) {
+        this(status, message, path, null);
+    }
+
+    // Asegúrate de generar los Getters y Setters para todos los atributos
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public int getStatus() { return status; }
+    public String getError() { return error; }
+    public String getMessage() { return message; }
+    public String getPath() { return path; }
+    public Map<String, String> getDetails() { return details; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/ProductFilterByCategoryDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
+public class ProductFilterByCategoryDto {
+
+    @Size(min = 2, max = 150, message = "El nombre debe tener entre 2 y 150 caracteres")
+    private String name;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio mínimo no puede ser negativo")
+    private Double minPrice;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio máximo no puede ser negativo")
+    private Double maxPrice;
+
+    @Min(value = 1, message = "El ID de usuario debe ser mayor a 0")
+    private Long userId;
+
+    public boolean hasValidPriceRange() {
+        if (minPrice != null && maxPrice != null) {
+            return maxPrice >= minPrice;
+        }
+        return true;
+    }
+
+    // Getters y Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Double getMinPrice() { return minPrice; }
+    public void setMinPrice(Double minPrice) { this.minPrice = minPrice; }
+    public Double getMaxPrice() { return maxPrice; }
+    public void setMaxPrice(Double maxPrice) { this.maxPrice = maxPrice; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/config/JacksonConfig.java">
+package ec.edu.ups.icc.fundamentos01.security.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+@Configuration
+public class JacksonConfig {
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return mapper;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/config/JwtProperties.java">
+package ec.edu.ups.icc.fundamentos01.security.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = "jwt")
+public class JwtProperties {
+    private String secret;
+    private Long expiration;
+    private Long refreshExpiration;
+    private String issuer;
+    private String header;
+    private String prefix;
+    
+    // TODO: Genera los Getters y Setters para todas las variables
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public Long getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Long expiration) {
+        this.expiration = expiration;
+    }
+
+    public Long getRefreshExpiration() {
+        return refreshExpiration;
+    }
+
+    public void setRefreshExpiration(Long refreshExpiration) {
+        this.refreshExpiration = refreshExpiration;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/config/SecurityDataInitializer.java">
+package ec.edu.ups.icc.fundamentos01.security.config;
+
+import ec.edu.ups.icc.fundamentos01.security.entities.RoleEntity;
+import ec.edu.ups.icc.fundamentos01.security.enums.RoleName;
+import ec.edu.ups.icc.fundamentos01.security.repositories.RoleRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SecurityDataInitializer implements CommandLineRunner {
+
+    private final RoleRepository roleRepository;
+
+    public SecurityDataInitializer(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
+
+    @Override
+    public void run(String... args) {
+        createRoleIfNotExists(RoleName.ROLE_USER, "Usuario estándar del sistema");
+        createRoleIfNotExists(RoleName.ROLE_ADMIN, "Administrador del sistema");
+    }
+
+    private void createRoleIfNotExists(RoleName roleName, String description) {
+        if (!roleRepository.existsByName(roleName)) {
+            RoleEntity role = new RoleEntity(roleName, description);
+            roleRepository.save(role);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/controllers/AuthController.java">
+package ec.edu.ups.icc.fundamentos01.security.controllers;
+
+import ec.edu.ups.icc.fundamentos01.security.dtos.AuthResponseDto;
+import ec.edu.ups.icc.fundamentos01.security.dtos.LoginRequestDto;
+import ec.edu.ups.icc.fundamentos01.security.dtos.RegisterRequestDto;
+import ec.edu.ups.icc.fundamentos01.security.services.AuthService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
+        AuthResponseDto response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterRequestDto registerRequest) {
+        AuthResponseDto response = authService.register(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/dtos/AuthResponseDto.java">
+package ec.edu.ups.icc.fundamentos01.security.dtos;
+
+import java.util.Set;
+
+public class AuthResponseDto {
+    private String token;
+    private String type = "Bearer";
+    private Long userId;
+    private String name;
+    private String email;
+    private Set<String> roles;
+
+    public AuthResponseDto() {}
+
+    public AuthResponseDto(String token, Long userId, String name, String email, Set<String> roles) {
+        this.token = token;
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.roles = roles;
+    }
+
+    // TODO: Genera Getters y Setters
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/dtos/LoginRequestDto.java">
+package ec.edu.ups.icc.fundamentos01.security.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class LoginRequestDto {
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ingresar un email válido")
+    private String email;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    private String password;
+
+    // TODO: Genera Constructor vacío, Getters y Setters
+    public LoginRequestDto() {
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/dtos/RegisterRequestDto.java">
+package ec.edu.ups.icc.fundamentos01.security.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+public class RegisterRequestDto {
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150)
+    private String name;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ingresar un email válido")
+    private String email;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, max = 100)
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$", message = "Debe contener al menos una mayúscula, minúscula y un número")
+    private String password;
+
+    // TODO: Genera Constructor vacío, Getters y Setters
+    public RegisterRequestDto() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/entities/RoleEntity.java">
+package ec.edu.ups.icc.fundamentos01.security.entities;
+
+import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity; // Ajusta el import según tu proyecto
+import ec.edu.ups.icc.fundamentos01.security.enums.RoleName;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "roles")
+public class RoleEntity extends BaseEntity {
+
+    @Column(nullable = false, unique = true, length = 50)
+    @Enumerated(EnumType.STRING)
+    private RoleName name;
+
+    @Column(length = 200)
+    private String description;
+
+    public RoleEntity() {}
+
+    public RoleEntity(RoleName name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // TODO: Genera los Getters y Setters
+    public RoleName getName() {
+        return name;
+    }
+
+    public void setName(RoleName name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/enums/RoleName.java">
+package ec.edu.ups.icc.fundamentos01.security.enums;
+
+public enum RoleName {
+    ROLE_USER("Usuario estándar con permisos básicos"),
+    ROLE_ADMIN("Administrador con permisos completos");
+
+    private final String description;
+
+    RoleName(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/filters/JwtAuthenticationEntryPoint.java">
+package ec.edu.ups.icc.fundamentos01.security.filters;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.response.ErrorResponse; // Asegúrate de que esta ruta coincida con tu clase ErrorResponse
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Component
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
+    private final ObjectMapper objectMapper;
+
+    public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        logger.error("Error de autenticación: {}", authException.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                "Token de autenticación inválido o no proporcionado. Debe incluir un token válido en el header Authorization: Bearer <token>",
+                request.getRequestURI()
+        );
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/filters/JwtAuthenticationFilter.java">
+package ec.edu.ups.icc.fundamentos01.security.filters;
+
+import ec.edu.ups.icc.fundamentos01.security.config.JwtProperties;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsServiceImpl;
+import ec.edu.ups.icc.fundamentos01.security.utils.JwtUtil;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtProperties jwtProperties;
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, JwtProperties jwtProperties) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+        this.jwtProperties = jwtProperties;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = getJwtFromRequest(request);
+
+            if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
+                String email = jwtUtil.getEmailFromToken(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                logger.debug("Usuario autenticado: {}", email);
+            }
+        } catch (Exception ex) {
+            logger.error("No se pudo establecer la autenticación del usuario", ex);
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(jwtProperties.getHeader());
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(jwtProperties.getPrefix())) {
+            return bearerToken.substring(jwtProperties.getPrefix().length());
+        }
+        return null;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/repositories/RoleRepository.java">
+package ec.edu.ups.icc.fundamentos01.security.repositories;
+
+import ec.edu.ups.icc.fundamentos01.security.entities.RoleEntity;
+import ec.edu.ups.icc.fundamentos01.security.enums.RoleName;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+@Repository
+public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
+    Optional<RoleEntity> findByName(RoleName name);
+    boolean existsByName(RoleName name);
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/services/AuthService.java">
+package ec.edu.ups.icc.fundamentos01.security.services;
+
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.BadRequestException;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.ConflictException;
+import ec.edu.ups.icc.fundamentos01.security.dtos.AuthResponseDto;
+import ec.edu.ups.icc.fundamentos01.security.dtos.LoginRequestDto;
+import ec.edu.ups.icc.fundamentos01.security.dtos.RegisterRequestDto;
+import ec.edu.ups.icc.fundamentos01.security.entities.RoleEntity;
+import ec.edu.ups.icc.fundamentos01.security.enums.RoleName;
+import ec.edu.ups.icc.fundamentos01.security.repositories.RoleRepository;
+import ec.edu.ups.icc.fundamentos01.security.utils.JwtUtil;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class AuthService {
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Transactional(readOnly = true)
+    public AuthResponseDto login(LoginRequestDto loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtil.generateToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toSet());
+
+        return new AuthResponseDto(jwt, userDetails.getId(), userDetails.getName(), userDetails.getEmail(), roles);
+    }
+
+    @Transactional
+    public AuthResponseDto register(RegisterRequestDto registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new ConflictException("El email ya está registrado");
+        }
+
+        UserEntity user = new UserEntity();
+        user.setName(registerRequest.getName());
+        user.setEmail(registerRequest.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
+
+        RoleEntity userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new BadRequestException("Rol por defecto no encontrado"));
+
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+
+        userRepository.save(user);
+
+        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        String jwt = jwtUtil.generateTokenFromUserDetails(userDetails);
+
+        Set<String> roleNames = user.getRoles().stream()
+                .map(role -> role.getName().name())
+                .collect(Collectors.toSet());
+
+        return new AuthResponseDto(jwt, user.getId(), user.getName(), user.getEmail(), roleNames);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/services/UserDetailsImpl.java">
+package ec.edu.ups.icc.fundamentos01.security.services;
+
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+public class UserDetailsImpl implements UserDetails {
+    private final Long id;
+    private final String name;
+    private final String email;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
+
+    public UserDetailsImpl(Long id, String name, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.authorities = authorities;
+    }
+
+    public static UserDetailsImpl build(UserEntity user) {
+        Collection<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
+
+        return new UserDetailsImpl(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPasswordHash(),
+                authorities
+        );
+    }
+
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
+    @Override
+    public String getPassword() { return password; }
+    @Override
+    public String getUsername() { return email; }
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+    @Override
+    public boolean isAccountNonLocked() { return true; }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+    @Override
+    public boolean isEnabled() { return true; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/services/UserDetailsServiceImpl.java">
+package ec.edu.ups.icc.fundamentos01.security.services;
+
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity user = userRepository.findByEmailAndDeletedFalse(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+
+        return UserDetailsImpl.build(user);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/utils/JwtUtil.java">
+package ec.edu.ups.icc.fundamentos01.security.utils;
+
+import ec.edu.ups.icc.fundamentos01.security.config.JwtProperties;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.stream.Collectors;
+
+@Component
+public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
+    private final JwtProperties jwtProperties;
+    private final SecretKey key;
+
+    public JwtUtil(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+    }
+
+    public String generateToken(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        return buildToken(userPrincipal);
+    }
+
+    public String generateTokenFromUserDetails(UserDetailsImpl userDetails) {
+        return buildToken(userDetails);
+    }
+
+    private String buildToken(UserDetailsImpl user) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtProperties.getExpiration());
+        String roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .subject(String.valueOf(user.getId()))
+                .claim("email", user.getEmail())
+                .claim("name", user.getName())
+                .claim("roles", roles)
+                .issuer(jwtProperties.getIssuer())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        return Long.parseLong(claims.getSubject());
+    }
+
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        return claims.get("email", String.class);
+    }
+
+    public boolean validateToken(String authToken) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(authToken);
+            return true;
+        } catch (SignatureException ex) {
+            logger.error("Firma JWT inválida: {}", ex.getMessage());
+        } catch (MalformedJwtException ex) {
+            logger.error("Token JWT malformado: {}", ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+            logger.error("Token JWT expirado: {}", ex.getMessage());
+        } catch (UnsupportedJwtException ex) {
+            logger.error("Token JWT no soportado: {}", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            logger.error("JWT claims string está vacío: {}", ex.getMessage());
+        }
+        return false;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/students/controllers/StudentController.java">
+package ec.edu.ups.icc.fundamentos01.students.controllers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import ec.edu.ups.icc.fundamentos01.students.models.Student;
+
+@RestController
+@RequestMapping("/students")
+
+public class StudentController {
+    
+    private List<Student> students = new ArrayList<>();
+    
+    public StudentController()
+    {
+        students.add(new Student(1L, "Juan", 30));
+        students.add(new Student(2L, "Diego", 10));
+    }
+
+    @GetMapping()
+    public List<Student> getAllStudents()
+    {
+        return students;
+    }
+
+    @GetMapping("/count")
+    public String getCount()
+    {
+        return "Total estudiantes: " + students.size();
+    }
+
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/students/models/Student.java">
+package ec.edu.ups.icc.fundamentos01.students.models;
+
+public class Student {
+    
+    private Long id;
+    private String name;
+    private int age;
+
+    
+    public Student(Long id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public int getAge() {
+        return age;
+    }
+
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/controllers/UserProductsController.java">
+package ec.edu.ups.icc.fundamentos01.users.controllers;
+
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductFilterByUserDto;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+public class UserProductsController {
+
+    private final ProductService productService;
+
+    public UserProductsController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping("/{id}/products")
+    public List<ProductResponseDto> findProductsByUser(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute ProductFilterByUserDto filters
+    ) {
+        return productService.findByUserIdWithFilters(id, filters);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/dtos/UserResponseDto.java">
+package ec.edu.ups.icc.fundamentos01.users.dtos;
+
+import java.time.LocalDateTime;
+
+public class UserResponseDto {
+    
+    private Long id;
+    private String name;
+    private String email;
+    private LocalDateTime createdAt; // Agregamos este campo
+    private LocalDateTime updatedAt; // Agregamos este campo
+
+    public UserResponseDto() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/models/UserModel.java">
+package ec.edu.ups.icc.fundamentos01.users.models;
+
+import java.time.LocalDateTime;
+
+/**
+ * Modelo de dominio del recurso users.
+ *
+ * Representa al usuario dentro de la lógica de negocio.
+ * No es una entidad de base de datos y no debe tener anotaciones JPA.
+ */
+public class UserModel {
+
+    /**
+     * Identificador del usuario.
+     */
+    private Long id;    
+    private String name;
+    private String email;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt; // Faltaba este campo
+    private boolean deleted;         // Faltaba este campo
+
+    /**
+     * Contraseña recibida desde la API.
+     *
+     * Se usa temporalmente antes de generar el passwordHash.
+     */
+    private String password;
+
+    /**
+     * Contraseña encriptada.
+     *
+     * Es el valor que posteriormente puede guardarse en la entidad.
+     */
+    private String passwordHash;
+
+    public UserModel() {
+    }
+
+    public UserModel(Long id, String name, String email, String password, String passwordHash) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.passwordHash = passwordHash;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+    
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/services/UserService.java">
+package ec.edu.ups.icc.fundamentos01.users.services;
+
+import java.util.List;
+
+import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
+
+/*
+ * Servicio que define las operaciones disponibles
+ * para la gestión de usuarios.
+ */
+public interface UserService {
+
+    List<UserResponseDto> findAll();
+
+    UserResponseDto findOne(Long id);
+
+    UserResponseDto create(CreateUserDto dto);
+
+    UserResponseDto update(Long id, UpdateUserDto dto);
+
+    UserResponseDto partialUpdate(Long id, PartialUpdateUserDto dto);
+
+    void delete(Long id);
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/Fundamentos01Application.java">
+package ec.edu.ups.icc.fundamentos01;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Fundamentos01Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Fundamentos01Application.class, args);
+	}
+
+}
+</file>
+
+<file path="src/main/resources/application-dev.yml">
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devdb
+    username: ups
+    password: ups123
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+logging:
+  level:
+    ec.edu.ups.pwp67: DEBUG
+jwt:
+  header: Authorization
+  prefix: "Bearer "
+  secret: dev-secret-not-for-production-min-256-bits
+  expiration: 3600000
+</file>
+
+<file path="src/main/resources/application-prod.yml">
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  hikari:
+    maximum-pool-size: 10
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+server:
+  port: ${PORT:8080}
+  error:
+    include-stacktrace: never
+logging:
+  level:
+    root: WARN
+    ec.edu.ups.pwp67: INFO
+  file:
+    name: /var/log/pwp67-api/application.log
+jwt:
+  header: Authorization
+  prefix: "Bearer "
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:3600000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+</file>
+
+<file path="src/test/java/ec/edu/ups/icc/fundamentos01/Fundamentos01ApplicationTests.java">
+package ec.edu.ups.icc.fundamentos01;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class Fundamentos01ApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+</file>
+
+<file path=".dockerignore">
+build/
+.gradle/
+.git/
+.idea/
+*.iml
+README.md
+.env
+gradle-app.setting
+.gradletasknamecache
+</file>
+
+<file path=".gitattributes">
+/gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary
+</file>
+
+<file path=".gitignore">
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+</file>
+
+<file path="docker-compose.yml">
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: pwp67_db
+      POSTGRES_USER: pwp67_user
+      POSTGRES_PASSWORD: pwp67_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pwp67_user -d pwp67_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pwp67_db
+      DB_USERNAME: pwp67_user
+      DB_PASSWORD: pwp67_password
+      JWT_SECRET: your-jwt-secret-change-this
+      JWT_EXPIRATION: 3600000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+</file>
+
+<file path="Dockerfile">
+# ETAPA 1: BUILD
+FROM gradle:8.5-jdk17 AS builder
+WORKDIR /build
+COPY build.gradle.kts settings.gradle.kts ./
+COPY gradle ./gradle
+RUN gradle dependencies --no-daemon
+COPY src ./src
+RUN gradle build -x test --no-daemon
+
+# ETAPA 2: RUNTIME
+FROM eclipse-temurin:17-jre-alpine
+RUN addgroup -S spring && adduser -S spring -G spring
+WORKDIR /app
+COPY --from=builder /build/build/libs/*.jar app.jar
+RUN chown spring:spring app.jar
+USER spring:spring
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health
+ENV SPRING_PROFILES_ACTIVE=prod
+ENTRYPOINT ["java", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-Xms256m", \
+  "-Xmx512m", \
+  "-jar", \
+  "app.jar"]
+</file>
+
+<file path="gradlew">
+#!/bin/sh
+
+#
+# Copyright © 2015 the original authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+##############################################################################
+#
+#   Gradle start up script for POSIX generated by Gradle.
+#
+#   Important for running:
+#
+#   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
+#       noncompliant, but you have some other compliant shell such as ksh or
+#       bash, then to run this script, type that shell name before the whole
+#       command line, like:
+#
+#           ksh Gradle
+#
+#       Busybox and similar reduced shells will NOT work, because this script
+#       requires all of these POSIX shell features:
+#         * functions;
+#         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
+#           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
+#         * compound commands having a testable exit status, especially «case»;
+#         * various built-in commands including «command», «set», and «ulimit».
+#
+#   Important for patching:
+#
+#   (2) This script targets any POSIX shell, so it avoids extensions provided
+#       by Bash, Ksh, etc; in particular arrays are avoided.
+#
+#       The "traditional" practice of packing multiple parameters into a
+#       space-separated string is a well documented source of bugs and security
+#       problems, so this is (mostly) avoided, by progressively accumulating
+#       options in "$@", and eventually passing that to Java.
+#
+#       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
+#       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
+#       see the in-line comments for details.
+#
+#       There are tweaks for specific operating systems such as AIX, CygWin,
+#       Darwin, MinGW, and NonStop.
+#
+#   (3) This script is generated from the Groovy template
+#       https://github.com/gradle/gradle/blob/3d91ce3b8caaf77ad09f381f43615b715b53f72c/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+#       within the Gradle project.
+#
+#       You can find Gradle at https://github.com/gradle/gradle/.
+#
+##############################################################################
+
+# Attempt to set APP_HOME
+
+# Resolve links: $0 may be a link
+app_path=$0
+
+# Need this for daisy-chained symlinks.
+while
+    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
+    [ -h "$app_path" ]
+do
+    ls=$( ls -ld "$app_path" )
+    link=${ls#*' -> '}
+    case $link in             #(
+      /*)   app_path=$link ;; #(
+      *)    app_path=$APP_HOME$link ;;
+    esac
+done
+
+# This is normally unused
+# shellcheck disable=SC2034
+APP_BASE_NAME=${0##*/}
+# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+
+# Use the maximum available, or set MAX_FD != -1 to use that value.
+MAX_FD=maximum
+
+warn () {
+    echo "$*"
+} >&2
+
+die () {
+    echo
+    echo "$*"
+    echo
+    exit 1
+} >&2
+
+# OS specific support (must be 'true' or 'false').
+cygwin=false
+msys=false
+darwin=false
+nonstop=false
+case "$( uname )" in                #(
+  CYGWIN* )         cygwin=true  ;; #(
+  Darwin* )         darwin=true  ;; #(
+  MSYS* | MINGW* )  msys=true    ;; #(
+  NONSTOP* )        nonstop=true ;;
+esac
+
+
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        # IBM's JDK on AIX uses strange locations for the executables
+        JAVACMD=$JAVA_HOME/jre/sh/java
+    else
+        JAVACMD=$JAVA_HOME/bin/java
+    fi
+    if [ ! -x "$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+else
+    JAVACMD=java
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+fi
+
+# Increase the maximum file descriptors if we can.
+if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
+    case $MAX_FD in #(
+      max*)
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        MAX_FD=$( ulimit -H -n ) ||
+            warn "Could not query maximum file descriptor limit"
+    esac
+    case $MAX_FD in  #(
+      '' | soft) :;; #(
+      *)
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        ulimit -n "$MAX_FD" ||
+            warn "Could not set maximum file descriptor limit to $MAX_FD"
+    esac
+fi
+
+# Collect all arguments for the java command, stacking in reverse order:
+#   * args from the command line
+#   * the main class name
+#   * -classpath
+#   * -D...appname settings
+#   * --module-path (only if needed)
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
+
+# For Cygwin or MSYS, switch paths to Windows format before running java
+if "$cygwin" || "$msys" ; then
+    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+
+    JAVACMD=$( cygpath --unix "$JAVACMD" )
+
+    # Now convert the arguments - kludge to limit ourselves to /bin/sh
+    for arg do
+        if
+            case $arg in                                #(
+              -*)   false ;;                            # don't mess with options #(
+              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
+                    [ -e "$t" ] ;;                      #(
+              *)    false ;;
+            esac
+        then
+            arg=$( cygpath --path --ignore --mixed "$arg" )
+        fi
+        # Roll the args list around exactly as many times as the number of
+        # args, so each arg winds up back in the position where it started, but
+        # possibly modified.
+        #
+        # NB: a `for` loop captures its iteration list before it begins, so
+        # changing the positional parameters here affects neither the number of
+        # iterations, nor the values presented in `arg`.
+        shift                   # remove old arg
+        set -- "$@" "$arg"      # push replacement arg
+    done
+fi
+
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command:
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#     and any embedded shellness will be escaped.
+#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
+#     treated as '${Hostname}' itself on the command line.
+
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+# Use "xargs" to parse quoted args.
+#
+# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
+#
+# In Bash we could simply go:
+#
+#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
+#   set -- "${ARGS[@]}" "$@"
+#
+# but POSIX shell has neither arrays nor command substitution, so instead we
+# post-process each arg (as a line of input to sed) to backslash-escape any
+# character that might be a shell metacharacter, then use eval to reverse
+# that process (while maintaining the separation between arguments), and wrap
+# the whole thing up as a single "set" statement.
+#
+# This will of course break if any of these variables contains a newline or
+# an unmatched quote.
+#
+
+eval "set -- $(
+        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
+        xargs -n1 |
+        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
+        tr '\n' ' '
+    )" '"$@"'
+
+exec "$JAVACMD" "$@"
+</file>
+
+<file path="gradlew.bat">
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+@rem SPDX-License-Identifier: Apache-2.0
+@rem
+
+@if "%DEBUG%"=="" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
+
+@rem Set local scope for the variables, and ensure extensions are enabled
+setlocal EnableExtensions
+
+set DIRNAME=%~dp0
+if "%DIRNAME%"=="" set DIRNAME=.
+@rem This is normally unused
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
+
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if %ERRORLEVEL% equ 0 goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+"%COMSPEC%" /c exit 1
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+"%COMSPEC%" /c exit 1
+
+:execute
+@rem Setup the command line
+
+
+
+@rem Execute Gradle
+@rem endlocal doesn't take effect until after the line is parsed and variables are expanded
+@rem which allows us to clear the local environment before executing the java command
+endlocal & "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %* & call :exitWithErrorLevel
+
+:exitWithErrorLevel
+@rem Use "%COMSPEC%" /c exit to allow operators to work properly in scripts
+"%COMSPEC%" /c exit %ERRORLEVEL%
+</file>
+
+<file path="render.yaml">
+services:
+  - type: pserv
+    name: pwp67-db
+    env: docker
+    plan: free
+    databases:
+      - name: pwp67_db
+        user: pwp67_user
+
+  - type: web
+    name: pwp67-api
+    env: java
+    plan: free
+    buildCommand: ./gradlew build -x test
+    startCommand: java -Xms256m -Xmx512m -jar build/libs/mi-api.jar
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pwp67-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 3600000
+</file>
+
+<file path="settings.gradle.kts">
+rootProject.name = "fundamentos01"
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/entities/CategoryEntity.java">
+package ec.edu.ups.icc.fundamentos01.categories.entities;
+
+import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.*;
+
+/*
+ * Entidad JPA del recurso categories.
+ *
+ * Representa la tabla categories en PostgreSQL.
+ * Una categoría puede estar asociada a muchos productos,
+ * pero en esta práctica la relación se define desde ProductEntity.
+ */
+@Entity
+@Table(name = "categories")
+public class CategoryEntity extends BaseEntity {
+
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(length = 500)
+    private String description;
+
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    private Set<ProductEntity> products = new HashSet<>();
+
+    // Constructor vacío
+    public CategoryEntity() {
+    }
+
+    // Constructor lleno
+    public CategoryEntity(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<ProductEntity> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<ProductEntity> products) {
+        this.products = products;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/ProductFilterByUserDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
+public class ProductFilterByUserDto {
+
+    @Size(min = 2, max = 150, message = "El nombre debe tener entre 2 y 150 caracteres")
+    private String name;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio mínimo no puede ser negativo")
+    private Double minPrice;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio máximo no puede ser negativo")
+    private Double maxPrice;
+
+    public boolean hasValidPriceRange() {
+        if (minPrice != null && maxPrice != null) {
+            return maxPrice >= minPrice;
+        }
+        return true;
+    }
+
+    public boolean hasEmptyName() {
+        return name == null || name.isBlank();
+    }
+
+    // Getters y Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Double getMinPrice() { return minPrice; }
+    public void setMinPrice(Double minPrice) { this.minPrice = minPrice; }
+    public Double getMaxPrice() { return maxPrice; }
+    public void setMaxPrice(Double maxPrice) { this.maxPrice = maxPrice; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/models/Product.java">
+package ec.edu.ups.icc.fundamentos01.products.models;
+
+import java.time.LocalDateTime;
+import ec.edu.ups.icc.fundamentos01.products.dtos.*;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+
+public class Product {
+    private Long id;
+    private String name;
+    private Double price;
+    private Integer stock;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean deleted;
+
+    // Constructor vacío
+    public Product() {}
+
+    // --- 1. FACTORY METHODS (Crear el modelo desde otras fuentes) ---
+
+    public static Product fromDto(CreateProductDto dto) {
+        Product product = new Product();
+        product.name = dto.getName();
+        product.price = dto.getPrice();
+        product.stock = dto.getStock();
+        return product;
+    }
+
+    public static Product fromEntity(ProductEntity entity) {
+        Product product = new Product();
+        product.id = entity.getId();
+        product.name = entity.getName();
+        product.price = entity.getPrice();
+        product.stock = entity.getStock();
+        product.createdAt = entity.getCreatedAt();
+        product.updatedAt = entity.getUpdatedAt();
+        product.deleted = entity.isDeleted();
+        return product;
+    }
+
+    // --- 2. CONVERSION METHODS (Exportar el modelo a otros formatos) ---
+
+    public ProductEntity toEntity() {
+        ProductEntity entity = new ProductEntity();
+        if (this.id != null) {
+            entity.setId(this.id);
+        }
+        entity.setName(this.name);
+        entity.setPrice(this.price);
+        entity.setStock(this.stock);
+        // Nota: createdAt, updatedAt y deleted los maneja automáticamente 
+        // tu BaseEntity de JPA, por eso no se setean aquí.
+        return entity;
+    }
+
+    public ProductResponseDto toResponseDto() {
+        return new ProductResponseDto(
+            this.id,
+            this.name,
+            this.price,
+            this.stock,
+            null, // owner
+            null, // category
+            this.createdAt,
+            this.updatedAt
+        );
+    }
+
+    // --- 3. REGLAS DE ACTUALIZACIÓN ---
+
+    public void update(UpdateProductDto dto) {
+        this.name = dto.getName();
+        this.price = dto.getPrice();
+        this.stock = dto.getStock();
+    }
+
+    public void partialUpdate(PartialUpdateProductDto dto) {
+        if (dto.getName() != null) {
+            this.name = dto.getName();
+        }
+        if (dto.getPrice() != null) {
+            this.price = dto.getPrice();
+        }
+        if (dto.getStock() != null) {
+            this.stock = dto.getStock();
+        }
+    }
+
+    // --- 4. GETTERS Y SETTERS TRADICIONALES ---
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/controllers/UsersController.java">
+package ec.edu.ups.icc.fundamentos01.users.controllers;
+
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import ec.edu.ups.icc.fundamentos01.users.services.UserService;
+import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
+
+/*
+ * Controlador REST encargado de exponer los endpoints HTTP
+ * para la gestión de usuarios.
+ *
+ * En esta práctica el controlador ya no contiene la lógica del CRUD.
+ * Solo recibe la petición y delega la operación al servicio.
+ */
+@RestController
+@RequestMapping("/users")
+public class UsersController {
+
+    private final UserService service;
+
+    /*
+     * Inyección de dependencias por constructor.
+     */
+    public UsersController(UserService service) {
+        this.service = service;
+    }
+
+    /*
+     * Endpoint para listar todos los usuarios.
+     * GET /users
+     */
+    @GetMapping
+    public List<UserResponseDto> findAll() {
+        return service.findAll();
+    }
+
+    /*
+     * Endpoint para buscar un usuario por id.
+     * GET /users/{id}
+     */
+    @GetMapping("/{id}")
+    public UserResponseDto findOne(@PathVariable Long id) { // Cambiado de Object a UserResponseDto
+        return service.findOne(id);
+    }
+
+    /*
+     * Endpoint para crear un nuevo usuario.
+     * POST /users
+     */
+    @PostMapping
+    public UserResponseDto create(@Valid @RequestBody CreateUserDto dto) {
+        return service.create(dto);
+    }
+
+    /*
+     * Endpoint para actualizar completamente un usuario.
+     * PUT /users/{id}
+     */
+    @PutMapping("/{id}")
+    public UserResponseDto update( // Cambiado de Object a UserResponseDto
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserDto dto
+    ) {
+        return service.update(id, dto);
+    }
+
+    /*
+     * Endpoint para actualizar parcialmente un usuario.
+     * PATCH /users/{id}
+     */
+    @PatchMapping("/{id}")
+    public UserResponseDto partialUpdate( // Cambiado de Object a UserResponseDto
+            @PathVariable Long id,
+            @Valid @RequestBody PartialUpdateUserDto dto
+    ) {
+        return service.partialUpdate(id, dto);
+    }
+
+    /*
+     * Endpoint para eliminar un usuario.
+     * DELETE /users/{id}
+     */
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) { // Cambiado de Object a void
+        service.delete(id);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/dtos/CreateUserDto.java">
+package ec.edu.ups.icc.fundamentos01.users.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para recibir los datos necesarios
+ * para crear un nuevo usuario desde una petición HTTP.
+ * * No incluye id porque el backend lo genera.
+ * No incluye createdAt porque el backend asigna la fecha de creación.
+ */
+public class CreateUserDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ingresar un email válido")
+    @Size(max = 150, message = "El email no debe superar los 150 caracteres")
+    private String email;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    private String password;
+
+    // Constructor vacío
+    public CreateUserDto() {
+    }
+
+    // Constructor lleno
+    public CreateUserDto(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/dtos/UpdateUserDto.java">
+package ec.edu.ups.icc.fundamentos01.users.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class UpdateUserDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ingresar un email válido")
+    @Size(max = 150, message = "El email no debe superar los 150 caracteres")
+    private String email;
+
+    // Constructor vacío
+    public UpdateUserDto() {
+    }
+
+    // Constructor lleno
+    public UpdateUserDto(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/entity/UserEntity.java">
+package ec.edu.ups.icc.fundamentos01.users.entity;
+
+import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import ec.edu.ups.icc.fundamentos01.security.entities.RoleEntity;
+import java.util.HashSet;
+import java.util.Set;
+
+/*
+ * Entidad JPA del recurso users.
+ *
+ * Representa la tabla users en PostgreSQL.
+ * Esta clase sí pertenece a la capa de persistencia.
+ */
+@Entity
+@Table(name = "users")
+public class UserEntity extends BaseEntity {
+
+    @Column(nullable = false, length = 150)
+    private String name;
+
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
+
+    @Column(nullable = false)
+    private String passwordHash;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<RoleEntity> roles = new HashSet<>();
+
+    // Constructor vacío
+    public UserEntity() {
+        super();
+    }
+
+    // Constructor lleno
+    public UserEntity(String name, String email, String passwordHash) {
+        super();
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
+
+    // Getters y Setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/mappers/UserMapper.java">
+package ec.edu.ups.icc.fundamentos01.users.mappers;
+
+import java.time.LocalDateTime;
+
+import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.models.UserModel;
+
+/*
+ * Clase encargada de convertir objetos entre DTOs, modelos y entidades.
+ *
+ * En esta práctica se agrega la conversión hacia UserEntity
+ * porque ya se trabaja con persistencia real en PostgreSQL.
+ */
+public class UserMapper {
+
+    /*
+     * Convierte un CreateUserDto en UserModel.
+     *
+     * El DTO contiene los datos recibidos desde la API.
+     * El modelo representa el usuario dentro de la lógica de la aplicación.
+     */
+    public static UserModel toModelFormDTO(CreateUserDto dto) {
+        UserModel model = new UserModel();
+        model.setName(dto.getName());
+        model.setEmail(dto.getEmail());
+        model.setPassword(dto.getPassword());
+        model.setPasswordHash(dto.getPassword());
+        model.setCreatedAt(LocalDateTime.now());
+        model.setDeleted(false);
+        
+        return model;
+    }
+
+    /*
+     * Convierte una entidad JPA en UserModel.
+     *
+     * Se usa cuando el repositorio devuelve datos desde PostgreSQL.
+     */
+    public static UserModel toModelFromEntity(UserEntity entity) {
+        UserModel model = new UserModel();
+
+        model.setId(entity.getId());
+        model.setName(entity.getName());
+        model.setEmail(entity.getEmail());
+        model.setPasswordHash(entity.getPasswordHash());
+        model.setCreatedAt(entity.getCreatedAt());
+        model.setUpdatedAt(entity.getUpdatedAt());
+        model.setDeleted(entity.isDeleted());
+
+        return model;
+    }
+
+    /*
+     * Convierte un UserModel en UserEntity.
+     *
+     * Se usa antes de guardar datos en la base de datos.
+     */
+    public static UserEntity toEntityFromModel(UserModel model) {
+        UserEntity entity = new UserEntity();
+
+        entity.setId(model.getId());
+        entity.setName(model.getName());
+        entity.setEmail(model.getEmail());
+        entity.setPasswordHash(model.getPasswordHash());
+
+        return entity;
+    }
+
+    /*
+     * Convierte un UserModel en UserResponseDto.
+     *
+     * No se expone password ni passwordHash.
+     */
+    public static UserResponseDto toResponse(UserModel model) {
+        UserResponseDto response = new UserResponseDto();
+        
+        response.setId(model.getId());
+        response.setName(model.getName());
+        response.setEmail(model.getEmail());
+        response.setCreatedAt(model.getCreatedAt());
+        response.setUpdatedAt(model.getUpdatedAt());
+        
+        return response;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/security/config/SecurityConfig.java">
+package ec.edu.ups.icc.fundamentos01.security.config;
+
+import ec.edu.ups.icc.fundamentos01.security.filters.JwtAuthenticationEntryPoint;
+import ec.edu.ups.icc.fundamentos01.security.filters.JwtAuthenticationFilter;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(unauthorizedHandler)
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                // Endpoints públicos
+                .requestMatchers("/auth/**").permitAll() 
+                .requestMatchers("/status/**").permitAll() 
+                .requestMatchers("/actuator/health").permitAll()
+                
+                // Endpoints por rol (¡Sin el /api al principio!)
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
+
+                // Resto requiere autenticación
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            
+            return http.build();
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/dtos/PartialUpdateUserDto.java">
+package ec.edu.ups.icc.fundamentos01.users.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para recibir los datos que se desean
+ * actualizar parcialmente en un usuario existente.
+ *
+ * Los campos pueden venir nulos cuando no se desean actualizar.
+ * No incluye createdAt porque la fecha de creación no debe modificarse.
+ */
+public class PartialUpdateUserDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ingresar un email válido")
+    @Size(max = 150, message = "El email no debe superar los 150 caracteres")
+    private String email;
+
+    @Size(min = 6, max = 100, message = "La contraseña debe tener entre 6 y 100 caracteres")
+    private String password;
+
+    // Constructor vacío
+    public PartialUpdateUserDto() {
+    }
+
+    // Constructor lleno
+    public PartialUpdateUserDto(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/services/UserServiceImpl.java">
+package ec.edu.ups.icc.fundamentos01.users.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.mappers.UserMapper;
+import ec.edu.ups.icc.fundamentos01.users.models.UserModel;
+import ec.edu.ups.icc.fundamentos01.users.repository.UserRepository;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.NotFoundException;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.ConflictException;
+
+/*
+ * Implementación del servicio de usuarios.
+ * * En esta clase se reemplaza la lista en memoria por UserRepository.
+ * El repositorio se encarga de comunicarse con PostgreSQL mediante JPA.
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    /*
+     * Retorna todos los usuarios almacenados en PostgreSQL.
+     */
+    @Override
+    public List<UserResponseDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .filter(entity -> !entity.isDeleted()) // Regla de negocio: filtrar eliminados
+                .map(UserMapper::toModelFromEntity)
+                .map(UserMapper::toResponse)
+                .toList();
+    }
+
+    /*
+     * Busca un usuario por id.
+     * Si no existe o está eliminado, lanza NotFoundException.
+     */
+    @Override
+    public UserResponseDto findOne(Long id) {
+        UserEntity entity = userRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("User not found"));
+            
+        if (entity.isDeleted()) {
+            throw new NotFoundException("User not found");
+        }
+        
+        UserModel model = UserMapper.toModelFromEntity(entity);
+        return UserMapper.toResponse(model);
+    }
+
+    /*
+     * Crea un nuevo usuario en la base de datos.
+     * Si el email ya está registrado, lanza ConflictException.
+     */
+    @Override
+    public UserResponseDto create(CreateUserDto dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new ConflictException("Email already registered");
+        }
+        
+        UserModel model = UserMapper.toModelFormDTO(dto);
+        UserEntity entity = UserMapper.toEntityFromModel(model);
+        
+        // ¡Usamos nuestra función para hashear!
+        entity.setPasswordHash(hashPasswordNative(dto.getPassword()));
+        
+        UserEntity savedEntity = userRepository.save(entity);
+        UserModel savedModel = UserMapper.toModelFromEntity(savedEntity);
+        return UserMapper.toResponse(savedModel);
+    }
+
+    /*
+     * Actualiza completamente un usuario existente.
+     * Si no existe o está eliminado, lanza NotFoundException.
+     */
+    @Override
+    public UserResponseDto update(Long id, UpdateUserDto dto) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("User not found");
+        }
+
+        entity.setName(dto.getName());
+        entity.setEmail(dto.getEmail());
+
+        UserEntity savedEntity = userRepository.save(entity);
+        UserModel model = UserMapper.toModelFromEntity(savedEntity);
+        
+        return UserMapper.toResponse(model);
+    }
+
+    /*
+     * Actualiza parcialmente un usuario existente.
+     * Si no existe o está eliminado, lanza NotFoundException.
+     */
+    @Override
+    public UserResponseDto partialUpdate(Long id, PartialUpdateUserDto dto) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("User not found");
+        }
+
+        if (dto.getName() != null) {
+            entity.setName(dto.getName());
+        }
+
+        if (dto.getEmail() != null) {
+            entity.setEmail(dto.getEmail());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            entity.setPasswordHash(hashPasswordNative(dto.getPassword()));
+        }
+
+        UserEntity savedEntity = userRepository.save(entity);
+        UserModel model = UserMapper.toModelFromEntity(savedEntity);
+        
+        return UserMapper.toResponse(model);
+    }
+
+    /*
+     * Elimina lógicamente un usuario por id.
+     * Si no existe o está eliminado, lanza NotFoundException.
+     */
+    @Override
+    public void delete(Long id) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (entity.isDeleted()) {
+            throw new NotFoundException("User not found");
+        }
+
+        entity.setDeleted(true);
+        userRepository.save(entity);
+    }
+
+    /*
+     * Método auxiliar para encriptar contraseñas usando SHA-256 nativo de Java.
+     * Evita tener que instalar Spring Security.
+     */
+    private String hashPasswordNative(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al encriptar la contraseña", e);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/categories/controllers/CategoriesController.java">
+package ec.edu.ups.icc.fundamentos01.categories.controllers;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoryResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CreateCategoryDto;
+import ec.edu.ups.icc.fundamentos01.categories.dtos.UpdateCategoryDto;
+import ec.edu.ups.icc.fundamentos01.categories.services.CategoryService;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductFilterByCategoryDto;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import jakarta.validation.Valid;
+
+/*
+ * Controlador REST encargado de exponer los endpoints HTTP
+ * para la gestión de categorías.
+ */
+@RestController
+@RequestMapping("/categories")
+public class CategoriesController {
+
+    private final CategoryService service;
+    private final ProductService productService;
+
+    public CategoriesController(CategoryService service, ProductService productService) {
+        this.service = service;
+        this.productService = productService;
+    }
+
+    @GetMapping
+    public List<CategoryResponseDto> findAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponseDto findOne(@PathVariable("id") Long id) {
+        return service.findOne(id);
+    }
+
+    @PostMapping
+    public CategoryResponseDto create(@Valid @RequestBody CreateCategoryDto dto) {
+        return service.create(dto);
+    }
+
+    @PutMapping("/{id}")
+    public CategoryResponseDto update(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateCategoryDto dto
+    ) {
+        return service.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") Long id) {
+        service.delete(id);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/core/exceptions/handler/GlobalExceptionHandler.java">
+package ec.edu.ups.icc.fundamentos01.core.exceptions.handler;
+
+import ec.edu.ups.icc.fundamentos01.core.exceptions.base.ApplicationException;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.response.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.validation.BindException;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(ex.getStatus(), ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(ex.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> 
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Datos de entrada inválidos",
+                request.getRequestURI(),
+                errors
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception ex, HttpServletRequest request) {
+        ex.printStackTrace();
+        
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Error interno del servidor",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindException(BindException ex, HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult()
+          .getFieldErrors()
+          .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Parámetros de consulta inválidos",
+                request.getRequestURI(),
+                errors
+        );
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * Maneja AuthorizationDeniedException (Spring Security 6.x)
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
+            AuthorizationDeniedException ex,
+            HttpServletRequest request) {
+        
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.FORBIDDEN,
+                "No tienes permisos para acceder a este recurso",
+                request.getRequestURI());
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(response);
+    }
+
+    /**
+     * Maneja AccessDeniedException (Spring Security legacy o manual) [cite: 626]
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getMessage();
+        if (message == null || message.isBlank()) {
+            message = "Acceso denegado";
+        }
+        
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.FORBIDDEN,
+                message,
+                request.getRequestURI()
+        );
+        
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(response);
+    }
+
+    /**
+     * Maneja AuthenticationException (Problemas de token o credenciales) [cite: 645, 646]
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException ex,
+            HttpServletRequest request) {
+            
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                "Credenciales inválidas o sesión expirada",
+                request.getRequestURI());
+                
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/PartialUpdateProductDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para actualizar parcialmente un producto.
+ *
+ * Solo se actualizan los campos enviados.
+ */
+public class PartialUpdateProductDto {
+
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio no puede ser negativo")
+    private Double price;
+
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    private Integer stock;
+
+    private java.util.Set<Long> categoryIds;
+
+    // Constructor vacío
+    public PartialUpdateProductDto() {
+    }
+
+    // Constructor lleno
+    public PartialUpdateProductDto(String name, Double price, Integer stock, Long categoryId) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.categoryIds = new java.util.HashSet<>();
+        this.categoryIds.add(categoryId);
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public java.util.Set<Long> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(java.util.Set<Long> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/ProductResponseDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import java.time.LocalDateTime;
+
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoryResponseDto;
+import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
+
+/*
+ * DTO utilizado para devolver al cliente los datos públicos
+ * de un producto, incluyendo información resumida
+ * del usuario propietario y de la categoría.
+ */
+public class ProductResponseDto {
+
+    private Long id;
+
+    private String name;
+
+    private Double price;
+
+    private Integer stock;
+
+    private UserSummaryDto owner; 
+    private java.util.List<CategorySummaryDto> categories;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+    
+    // Constructor vacío
+    public ProductResponseDto() {
+    }
+
+    // Constructor lleno
+    public ProductResponseDto(Long id, String name, Double price, Integer stock, UserSummaryDto owner, CategorySummaryDto category, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.owner = owner;
+        this.categories = new java.util.ArrayList<>();
+        this.categories.add(category);
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public UserSummaryDto getOwner() {
+        return owner;
+    }
+
+    public java.util.List<CategorySummaryDto> getCategories() {
+        return categories;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public void setOwner(UserSummaryDto owner) {
+        this.owner = owner;
+    }
+
+    public void setCategories(java.util.List<CategorySummaryDto> categories) {
+        this.categories = categories;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    // Clase interna para representar un resumen del usuario
+    public static class UserSummary {
+        private Long id;
+        private String email;
+        private String name;
+
+        public UserSummary(Long id, String email, String name) {
+            this.id = id;
+            this.email = email;
+            this.name = name;
+        }
+
+        // Getters y setters
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class UserSummaryDto {
+        private Long id;
+        private String name;
+        private String email;
+        // Necesitas sus constructores, getters y setters aquí
+        public UserSummaryDto() {
+        }
+
+        public UserSummaryDto(Long id, String name, String email) {
+            this.id = id;
+            this.name = name;
+            this.email = email;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
+    public static class CategorySummaryDto {
+        private Long id;
+        private String name;
+        private String description;
+        // Necesitas sus constructores, getters y setters aquí
+
+        public CategorySummaryDto() {
+        }
+
+        public CategorySummaryDto(Long id, String name, String description) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/UpdateProductDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para actualizar completamente un producto.
+ *
+ * Permite actualizar los datos editables del producto
+ * y cambiar la categoría asociada.
+ *
+ * No permite cambiar el usuario propietario.
+ */
+public class UpdateProductDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio no puede ser negativo")
+    private Double price;
+
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    private Integer stock;
+
+    @NotEmpty(message = "Debe seleccionar al menos una categoría")
+    private java.util.Set<Long> categoryIds;
+
+    // Constructor vacío
+    public UpdateProductDto() {
+    }
+
+    // Constructor lleno
+    public UpdateProductDto(String name, Double price, Integer stock, Long categoryId) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.categoryIds = new java.util.HashSet<>();
+        this.categoryIds.add(categoryId);
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public java.util.Set<Long> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(java.util.Set<Long> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/entities/ProductEntity.java">
+package ec.edu.ups.icc.fundamentos01.products.entities;
+
+import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
+import ec.edu.ups.icc.fundamentos01.core.entities.BaseEntity;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.*;
+
+/*
+ * Entidad JPA del recurso products.
+ *
+ * Representa la tabla products en PostgreSQL.
+ * Cada producto pertenece a un usuario y a una categoría.
+ */
+@Entity
+@Table(name = "products")
+public class ProductEntity extends BaseEntity {
+
+    @Column(nullable = false, length = 150)
+    private String name;
+
+    @Column(nullable = false)
+    private Double price;
+
+    @Column(nullable = false)
+    private Integer stock;
+
+    /*
+     * Relación muchos a uno con UserEntity.
+     *
+     * Muchos productos pueden pertenecer a un usuario.
+     * La columna user_id se crea en la tabla products.
+     */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity owner;
+
+    /*
+     * Relación muchos a muchos entre productos y categorías.
+     * Un producto puede pertenecer a varias categorías.
+     * Una categoría puede tener varios productos.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "product_categories",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<CategoryEntity> categories = new HashSet<>();
+
+    // Constructor vacío
+    public ProductEntity() {
+    }
+
+    // Constructor lleno
+    public ProductEntity(String name, Double price, Integer stock, UserEntity owner, CategoryEntity category) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.owner = owner;
+        this.categories.add(category);
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public UserEntity getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserEntity owner) {
+        this.owner = owner;
+    }
+
+    public Set<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<CategoryEntity> categories) {
+        this.categories = categories;
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/mappers/ProductMapper.java">
+package ec.edu.ups.icc.fundamentos01.products.mappers;
+
+import java.util.List;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+
+public class ProductMapper {
+
+    // 1. Mapeo individual (De Entity a DTO)
+    public static ProductResponseDto toResponse(ProductEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        ProductResponseDto dto = new ProductResponseDto();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setPrice(entity.getPrice());
+        dto.setStock(entity.getStock());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+
+        // Mapeo del objeto anidado Owner (Usuario)
+        if (entity.getOwner() != null) {
+            ProductResponseDto.UserSummaryDto ownerDto = new ProductResponseDto.UserSummaryDto();
+            ownerDto.setId(entity.getOwner().getId());
+            ownerDto.setName(entity.getOwner().getName());
+            ownerDto.setEmail(entity.getOwner().getEmail());
+            dto.setOwner(ownerDto);
+        }
+
+        // Mapeo del objeto anidado Category (Categoría)
+        if (entity.getCategories() != null && !entity.getCategories().isEmpty()) {
+            List<ProductResponseDto.CategorySummaryDto> categoryDtos = entity.getCategories().stream()
+                .map(cat -> {
+                    ProductResponseDto.CategorySummaryDto catDto = new ProductResponseDto.CategorySummaryDto();
+                    catDto.setId(cat.getId());
+                    catDto.setName(cat.getName());
+                    catDto.setDescription(cat.getDescription());
+                    return catDto;
+                }).toList();
+                
+            dto.setCategories(categoryDtos);
+        }
+
+        return dto;
+    }
+
+    // 2. NUEVO: Mapeo "Tipo Lista" (El que pidió el profe)
+    public static List<ProductResponseDto> toResponseList(List<ProductEntity> entities) {
+        if (entities == null) {
+            return null;
+        }
+        return entities.stream()
+                .map(ProductMapper::toResponse)
+                .toList();
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/users/repository/UserRepository.java">
+package ec.edu.ups.icc.fundamentos01.users.repository;
+
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+
+/**
+ * Repositorio encargado de gestionar la persistencia
+ * de usuarios usando Spring Data JPA.
+ */
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    
+    // Spring Data JPA generará automáticamente la consulta SQL basada en el nombre del método
+    Optional<UserEntity> findByEmail(String email);
+
+    boolean existsByIdAndDeletedFalse(Long id);
+
+    Optional<UserEntity> findByEmailAndDeletedFalse(String email);
+    boolean existsByEmail(String email);
+    Optional<UserEntity> findByIdAndDeletedFalse(Long id);
+}
+</file>
+
+<file path="src/main/resources/application.yml">
+spring:
+  profiles:
+    active: dev
+  application:
+    name: pwp67-api
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/dtos/CreateProductDto.java">
+package ec.edu.ups.icc.fundamentos01.products.dtos;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+/*
+ * DTO utilizado para recibir los datos necesarios
+ * para crear un producto.
+ *
+ * Incluye userId y categoryId porque el producto
+ * debe relacionarse con un usuario y una categoría existentes.
+ */
+public class CreateProductDto {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    private String name;
+
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio no puede ser negativo")
+    private Double price;
+
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    private Integer stock;
+
+    @NotEmpty(message = "Debe seleccionar al menos una categoría")
+    private java.util.Set<Long> categoryIds;
+
+    // Constructor vacío
+    public CreateProductDto() {
+    }
+
+    // Constructor lleno
+    public CreateProductDto(String name, Double price, Integer stock, Long categoryId) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.categoryIds = new java.util.HashSet<>();
+        this.categoryIds.add(categoryId);
+    }
+
+    // Getters y setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public java.util.Set<Long> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(java.util.Set<Long> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
+}
+</file>
+
+<file path="build.gradle.kts">
+plugins {
+    java
+    id("org.springframework.boot") version "3.5.4"
+    id("io.spring.dependency-management") version "1.1.7"
+}
+
+group = "ec.edu.ups.icc"
+version = "0.0.1-SNAPSHOT"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+	runtimeOnly ("org.postgresql:postgresql")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+}
+
+springBoot {
+    mainClass.set("ec.edu.ups.icc.fundamentos01.Fundamentos01Application") 
+}
+
+tasks.bootJar {
+    archiveFileName.set("mi-api.jar")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/repositories/ProductRepository.java">
+package ec.edu.ups.icc.fundamentos01.products.repositories;
+
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+
+/*
+ * Repositorio encargado de gestionar la persistencia
+ * de productos usando Spring Data JPA.
+ *
+ * Incluye consultas usando relaciones con UserEntity y CategoryEntity.
+ */
+@Repository
+public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
+
+    Optional<ProductEntity> findByNameIgnoreCaseAndDeletedFalse(String name);
+
+    List<ProductEntity> findByDeletedFalse();
+
+    Optional<ProductEntity> findByIdAndDeletedFalse(Long id);
+
+    List<ProductEntity> findByOwner_IdAndDeletedFalse(Long ownerId);
+
+    @Query("""
+        SELECT p FROM ProductEntity p 
+        WHERE p.deleted = false 
+        AND p.owner.id = :userId 
+        AND p.owner.deleted = false 
+        AND (:name IS NULL OR LOWER(CAST(p.name AS STRING)) LIKE LOWER(CONCAT('%', :name, '%'))) 
+        AND (:minPrice IS NULL OR p.price >= :minPrice) 
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+    """)
+    List<ProductEntity> findByOwnerIdWithFilters(
+            @Param("userId") Long userId,
+            @Param("name") String name,
+            @Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice
+    );
+
+    @Query("""
+        SELECT DISTINCT p
+        FROM ProductEntity p
+        JOIN p.categories c
+        WHERE p.deleted = false
+        AND c.id = :categoryId
+        AND c.deleted = false
+        AND p.owner.deleted = false
+        AND (:name IS NULL OR LOWER(CAST(p.name AS STRING)) LIKE LOWER(CONCAT('%', :name, '%')))
+        AND (:minPrice IS NULL OR p.price >= :minPrice)
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+        AND (:userId IS NULL OR p.owner.id = :userId)
+    """)
+    List<ProductEntity> findByCategoryIdWithFilters(
+            @Param("categoryId") Long categoryId,
+            @Param("name") String name,
+            @Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice,
+            @Param("userId") Long userId
+    );
+
+    /* Consultas generales paginadas */
+    @Query(
+        value = "SELECT p FROM ProductEntity p WHERE p.deleted = false",
+        countQuery = "SELECT COUNT(p) FROM ProductEntity p WHERE p.deleted = false"
+    )
+    Page<ProductEntity> findActivePage(Pageable pageable);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.deleted = false")
+    Slice<ProductEntity> findActiveSlice(Pageable pageable);
+
+
+    /* ========================================================================= */
+    /* NUEVOS MÉTODOS SOLICITADOS (PRACTICA)                                     */
+    /* ========================================================================= */
+
+    // 1. Método para el Slice filtrado por el dueño (Derivado por Spring Data, no requiere @Query)
+    Slice<ProductEntity> findByOwner_IdAndDeletedFalse(Long ownerId, Pageable pageable);
+
+    // 2. Método para Paginación con múltiples filtros (Reemplaza al que tenías repetido)
+    @Query(
+    value = """
+        SELECT DISTINCT p FROM ProductEntity p JOIN p.categories c 
+        WHERE p.deleted = false AND c.id = :categoryId AND c.deleted = false 
+        AND (:name IS NULL OR LOWER(CAST(p.name AS STRING)) LIKE CONCAT('%', LOWER(CAST(:name AS STRING)), '%'))
+        AND (:minPrice IS NULL OR p.price >= :minPrice) 
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice) 
+        AND (:userId IS NULL OR p.owner.id = :userId)
+    """,
+    countQuery = """
+        SELECT COUNT(DISTINCT p) FROM ProductEntity p JOIN p.categories c 
+        WHERE p.deleted = false AND c.id = :categoryId AND c.deleted = false 
+        AND (:name IS NULL OR LOWER(CAST(p.name AS STRING)) LIKE CONCAT('%', LOWER(CAST(:name AS STRING)), '%'))
+        AND (:minPrice IS NULL OR p.price >= :minPrice) 
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice) 
+        AND (:userId IS NULL OR p.owner.id = :userId)
+    """
+    )
+    Page<ProductEntity> findByCategoryIdWithFiltersPage(
+        @Param("categoryId") Long categoryId, @Param("name") String name,
+        @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice,
+        @Param("userId") Long userId, Pageable pageable
+    );
+
+    // 3. Método para Slice con múltiples filtros (Solución al error del popup)
+    @Query("""
+        SELECT DISTINCT p FROM ProductEntity p JOIN p.categories c 
+        WHERE p.deleted = false AND c.id = :categoryId AND c.deleted = false AND p.owner.deleted = false 
+        AND (:name IS NULL OR LOWER(CAST(p.name AS STRING)) LIKE CONCAT('%', LOWER(CAST(:name AS STRING)), '%'))
+        AND (:minPrice IS NULL OR p.price >= :minPrice) 
+        AND (:maxPrice IS NULL OR p.price <= :maxPrice) 
+        AND (:userId IS NULL OR p.owner.id = :userId)
+    """)
+    Slice<ProductEntity> findByCategoryIdWithFiltersSlice(
+        @Param("categoryId") Long categoryId, @Param("name") String name,
+        @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice,
+        @Param("userId") Long userId, Pageable pageable
+    );
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/services/ProductService.java">
+package ec.edu.ups.icc.fundamentos01.products.services;
+
+import java.util.List;
+import ec.edu.ups.icc.fundamentos01.products.dtos.*;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
+
+import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.Slice;
+    import ec.edu.ups.icc.fundamentos01.core.dto.PaginationDto;
+
+public interface ProductService {
+    List<ProductResponseDto> findAll();
+    ProductResponseDto findOne(Long id);
+    ProductResponseDto create(CreateProductDto dto, UserDetailsImpl currentUser);
+    ProductResponseDto update(Long id, UpdateProductDto dto, UserDetailsImpl currentUser);
+    ProductResponseDto partialUpdate(Long id, PartialUpdateProductDto dto, UserDetailsImpl currentUser);
+    void delete(Long id, UserDetailsImpl currentUser);
+    List<ProductResponseDto> findByUserId(Long userId);
+    boolean validateName(String name);
+    List<ProductResponseDto> findByUserIdWithFilters(Long userId, ProductFilterByUserDto filters);
+    List<ProductResponseDto> findByCategoryIdWithFilters(Long categoryId, ProductFilterByCategoryDto filters);
+    Page<ProductResponseDto> findAllPage(PaginationDto pagination);
+    Slice<ProductResponseDto> findAllSlice(PaginationDto pagination, UserDetailsImpl currentUser);
+    Page<ProductResponseDto> findByCategoryIdWithFiltersPage(Long categoryId, ProductFilterByCategoryDto filters, PaginationDto pagination);
+    Slice<ProductResponseDto> findByCategoryIdWithFiltersSlice(Long categoryId, ProductFilterByCategoryDto filters, PaginationDto pagination);
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/controllers/ProductsController.java">
+package ec.edu.ups.icc.fundamentos01.products.controllers;
+
+import java.util.List;
+import org.springframework.web.bind.annotation.*;
+import ec.edu.ups.icc.fundamentos01.products.dtos.*;
+import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import ec.edu.ups.icc.fundamentos01.core.dto.PaginationDto;
+
+@RestController
+@RequestMapping("/products")
+public class ProductsController {
+
+    private final ProductService service;
+
+    public ProductsController(ProductService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ProductResponseDto> findAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ProductResponseDto findOne(@PathVariable("id") Long id) {
+        return service.findOne(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponseDto create(
+            @Valid @RequestBody CreateProductDto dto,
+            @AuthenticationPrincipal UserDetailsImpl currentUser
+    ) {
+        return service.create(dto, currentUser);
+    }
+
+    @PutMapping("/{id}")
+    public ProductResponseDto update(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateProductDto dto,
+            @AuthenticationPrincipal UserDetailsImpl currentUser
+    ) {
+        return service.update(id, dto, currentUser);
+    }
+
+    @PatchMapping("/{id}")
+    public ProductResponseDto partialUpdate(
+            @PathVariable Long id,
+            @Valid @RequestBody PartialUpdateProductDto dto,
+            @AuthenticationPrincipal UserDetailsImpl currentUser
+    ) {
+        return service.partialUpdate(id, dto, currentUser);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl currentUser
+    ) {
+        service.delete(id, currentUser);
+    }
+
+    /*
+     * Endpoint custom para validar si el nombre de un producto ya existe.
+     *
+     * POST /products/validate-name
+     */
+    @PostMapping("/validate-name")
+    public java.util.Map<String, Boolean> validateName(@RequestBody java.util.Map<String, String> request) {
+        // Extraemos el nombre del JSON que enviaste desde Bruno
+        String nameToCheck = request.get("name");
+        
+        // Llamamos al servicio para ver si existe
+        boolean exists = service.validateName(nameToCheck);
+        
+        // Devolvemos un JSON estructurado de respuesta
+        return java.util.Map.of("exists", exists);
+    }
+
+    /**
+     * Paginación normal: TODOS pueden ver TODOS los productos activos.
+     */
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<ProductResponseDto>> findAllPaginado(
+            @Valid PaginationDto pagination
+    ) {
+        Page<ProductResponseDto> products = service.findAllPage(pagination);
+        return ResponseEntity.ok(products);
+    }
+
+    /**
+     * Slice: TODOS pueden acceder, pero SOLO ven SUS propios productos.
+     */
+    @GetMapping("/slice")
+    public ResponseEntity<Slice<ProductResponseDto>> findAllSlice(
+            @Valid PaginationDto pagination,
+            @AuthenticationPrincipal UserDetailsImpl currentUser // Inyectamos al usuario
+    ) {
+        Slice<ProductResponseDto> products = service.findAllSlice(pagination, currentUser);
+        return ResponseEntity.ok(products);
+    }
+}
+</file>
+
+<file path="src/main/java/ec/edu/ups/icc/fundamentos01/products/services/ProductServiceImpl.java">
+package ec.edu.ups.icc.fundamentos01.products.services;
+
+import java.util.List;
+import java.util.Set;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ec.edu.ups.icc.fundamentos01.products.dtos.*;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductEntity;
+import ec.edu.ups.icc.fundamentos01.products.mappers.ProductMapper;
+import ec.edu.ups.icc.fundamentos01.products.repositories.ProductRepository;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
+import ec.edu.ups.icc.fundamentos01.users.entity.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.repository.UserRepository;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.NotFoundException;
+import ec.edu.ups.icc.fundamentos01.categories.entities.CategoryEntity;
+import ec.edu.ups.icc.fundamentos01.categories.repositories.CategoryRepository;
+import ec.edu.ups.icc.fundamentos01.core.dto.PaginationDto;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.BadRequestException;
+import ec.edu.ups.icc.fundamentos01.core.exceptions.domain.ConflictException;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+
+    public ProductServiceImpl(
+            ProductRepository productRepository,
+            UserRepository userRepository,
+            CategoryRepository categoryRepository
+    ) {
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+    }
+
+    @Override
+    public List<ProductResponseDto> findByUserId(Long userId) {
+        if (!userRepository.existsByIdAndDeletedFalse(userId)) {
+            throw new NotFoundException("User not found");
+        }
+        
+        List<ProductEntity> list = productRepository.findByOwner_IdAndDeletedFalse(userId);
+        return ProductMapper.toResponseList(list);
+    }
+
+    @Override
+    public List<ProductResponseDto> findAll() {
+        List<ProductEntity> list = productRepository.findByDeletedFalse();
+        return ProductMapper.toResponseList(list);
+    }
+
+    @Override
+    public ProductResponseDto findOne(Long id) {
+        ProductEntity entity = productRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        return ProductMapper.toResponse(entity); 
+    }
+
+    /*
+     * Elimina lógicamente un producto.
+     * Se valida ownership en el servicio.
+     */
+    @Override
+    @Transactional
+    public void delete(Long id, UserDetailsImpl currentUser) {
+        ProductEntity entity = findActiveProductOrThrow(id);
+        
+        // VALIDA QUE EL USUARIO AUTENTICADO PUEDA ELIMINAR ESTE PRODUCTO
+        validateOwnership(entity, currentUser);
+        
+        entity.setDeleted(true);
+        productRepository.save(entity);
+    }
+
+    /*
+     * Crea un producto usando como owner al usuario autenticado.
+     */
+    @Override
+    @Transactional
+    public ProductResponseDto create(CreateProductDto dto, UserDetailsImpl currentUser) {
+        // 1. Obtenemos el owner desde el token JWT, NO desde el DTO
+        UserEntity owner = findCurrentUserEntity(currentUser);
+
+        // 2. Encontramos la categoria
+        Set<CategoryEntity> categories = validateAndGetCategories(dto.getCategoryIds());
+
+        // Validacion de negocio, por ejemplo que no exista un producto con el mismo nombre
+        if (productRepository.findByNameIgnoreCaseAndDeletedFalse(dto.getName()).isPresent()) {
+            throw new ConflictException("Product name already registered");
+        }
+
+        // Generamos la entidad a partir del DTO
+        ProductEntity entity = new ProductEntity();
+        entity.setName(dto.getName());
+        entity.setPrice(dto.getPrice());
+        entity.setStock(dto.getStock());
+        entity.setOwner(owner); // Se asigna automáticamente al usuario logueado
+        entity.setCategories(categories);
+
+        ProductEntity savedEntity = productRepository.save(entity);
+        return ProductMapper.toResponse(savedEntity);
+    }
+
+    /*
+     * Actualiza completamente un producto activo.
+     * Se valida ownership en el servicio.
+     */
+    @Override
+    @Transactional
+    public ProductResponseDto update(Long id, UpdateProductDto dto, UserDetailsImpl currentUser) {
+        ProductEntity entity = findActiveProductOrThrow(id);
+
+        // VALIDA QUE EL USUARIO AUTENTICADO PUEDA MODIFICAR ESTE PRODUCTO
+        validateOwnership(entity, currentUser);
+
+        Set<CategoryEntity> categories = validateAndGetCategories(dto.getCategoryIds());
+
+        entity.setName(dto.getName());
+        entity.setPrice(dto.getPrice());
+        entity.setStock(dto.getStock());
+        entity.setCategories(categories);
+
+        ProductEntity savedEntity = productRepository.save(entity);
+        return ProductMapper.toResponse(savedEntity);
+    }
+
+    /*
+     * Actualiza parcialmente un producto activo.
+     * Se valida ownership en el servicio.
+     */
+    @Override
+    @Transactional
+    public ProductResponseDto partialUpdate(Long id, PartialUpdateProductDto dto, UserDetailsImpl currentUser) {
+        ProductEntity entity = findActiveProductOrThrow(id);
+
+        // VALIDA QUE EL USUARIO AUTENTICADO PUEDA MODIFICAR ESTE PRODUCTO
+        validateOwnership(entity, currentUser);
+
+        if (dto.getName() != null) {
+            entity.setName(dto.getName());
+        }
+
+        if (dto.getPrice() != null) {
+            entity.setPrice(dto.getPrice());
+        }
+
+        if (dto.getStock() != null) {
+            entity.setStock(dto.getStock());
+        }
+
+        if (dto.getCategoryIds() != null) {
+            Set<CategoryEntity> categories = validateAndGetCategories(dto.getCategoryIds());
+            entity.setCategories(categories);
+        }
+
+        ProductEntity savedEntity = productRepository.save(entity);
+        return ProductMapper.toResponse(savedEntity);
+    }
+
+    /*
+     * Valida si un nombre de producto ya existe en la base de datos.
+     */
+    @Override
+    public boolean validateName(String name) {
+        return productRepository.findByNameIgnoreCaseAndDeletedFalse(name).isPresent();
+    }
+
+    @Override
+    public List<ProductResponseDto> findByUserIdWithFilters(Long userId, ProductFilterByUserDto filters) {
+        if (!userRepository.existsByIdAndDeletedFalse(userId)) {
+            throw new NotFoundException("User not found");
+        }
+        
+        validateUserFilters(filters);
+        String name = normalizeName(filters.getName());
+        
+        List<ProductEntity> list = productRepository.findByOwnerIdWithFilters(
+                userId, name, filters.getMinPrice(), filters.getMaxPrice()
+        );
+        
+        return ProductMapper.toResponseList(list);
+    }
+
+    @Override
+    public List<ProductResponseDto> findByCategoryIdWithFilters(Long categoryId, ProductFilterByCategoryDto filters) {
+        if (!categoryRepository.existsByIdAndDeletedFalse(categoryId)) {
+            throw new NotFoundException("Category not found");
+        }
+        
+        validateCategoryFilters(filters);
+        String name = normalizeName(filters.getName());
+        
+        List<ProductEntity> list = productRepository.findByCategoryIdWithFilters(
+                categoryId, name, filters.getMinPrice(), filters.getMaxPrice(), filters.getUserId()
+        );
+        
+        return ProductMapper.toResponseList(list);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDto> findAllPage(PaginationDto pagination) {
+        Pageable pageable = createPageable(pagination);
+        return productRepository.findActivePage(pageable)
+                .map(ProductMapper::toResponse);
+    }
+
+    // Reemplaza tu método findAllSlice actual por este:
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Slice<ProductResponseDto> findAllSlice(PaginationDto pagination, UserDetailsImpl currentUser) {
+        if (currentUser == null) {
+            throw new AccessDeniedException("Usuario no autenticado");
+        }
+        
+        Pageable pageable = createPageable(pagination);
+        
+        // Aquí está la magia: filtramos directamente en la base de datos por el ID del owner
+        return productRepository.findByOwner_IdAndDeletedFalse(currentUser.getId(), pageable)
+                .map(ProductMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDto> findByCategoryIdWithFiltersPage(Long categoryId, ProductFilterByCategoryDto filters, PaginationDto pagination) {
+        if (!categoryRepository.existsByIdAndDeletedFalse(categoryId)) {
+            throw new NotFoundException("Category not found");
+        }
+        validateCategoryFilters(filters);
+        String name = normalizeName(filters.getName());
+        Pageable pageable = createPageable(pagination);
+        
+        return productRepository.findByCategoryIdWithFiltersPage(
+                categoryId, name, filters.getMinPrice(), filters.getMaxPrice(), filters.getUserId(), pageable
+        ).map(ProductMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Slice<ProductResponseDto> findByCategoryIdWithFiltersSlice(Long categoryId, ProductFilterByCategoryDto filters, PaginationDto pagination) {
+        if (!categoryRepository.existsByIdAndDeletedFalse(categoryId)) {
+            throw new NotFoundException("Category not found");
+        }
+        validateCategoryFilters(filters);
+        String name = normalizeName(filters.getName());
+        Pageable pageable = createPageable(pagination);
+
+        return productRepository.findByCategoryIdWithFiltersSlice(
+                categoryId, name, filters.getMinPrice(), filters.getMaxPrice(), filters.getUserId(), pageable
+        ).map(ProductMapper::toResponse);
+    }
+
+
+    // ==========================================
+    // --- Helpers Privados Generales ---
+    // ==========================================
+
+    private void validateUserFilters(ProductFilterByUserDto filters) {
+        if (filters == null) return;
+        if (!filters.hasValidPriceRange()) {
+            throw new BadRequestException("El precio máximo debe ser mayor o igual al mínimo");
+        };
+    }
+
+    private void validateCategoryFilters(ProductFilterByCategoryDto filters) {
+        if (filters == null) return;
+        if (!filters.hasValidPriceRange()) {
+            throw new BadRequestException("El precio máximo debe ser mayor o igual al mínimo");
+        }
+        if (filters.getUserId() != null && !userRepository.existsByIdAndDeletedFalse(filters.getUserId())) {
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    private String normalizeName(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        return name.trim();
+    }
+
+    private java.util.Set<CategoryEntity> validateAndGetCategories(java.util.Set<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            throw new BadRequestException("Debe seleccionar al menos una categoría");
+        }
+        
+        java.util.Set<CategoryEntity> categories = new java.util.HashSet<>();
+        for (Long catId : categoryIds) {
+            CategoryEntity category = categoryRepository.findById(catId)
+                    .orElseThrow(() -> new NotFoundException("Category not found"));
+            if (category.isDeleted()) {
+                throw new NotFoundException("Category not found");
+            }
+            categories.add(category);
+        }
+        return categories;
+    }
+
+
+    // ==========================================
+    // --- Helpers Privados Paginación ---
+    // ==========================================
+
+    private Pageable createPageable(PaginationDto pagination) {
+        String sortBy = normalizeSortBy(pagination.getSortBy());
+        Sort.Direction direction = normalizeDirection(pagination.getDirection());
+        Sort sort = Sort.by(direction, sortBy);
+        return org.springframework.data.domain.PageRequest.of(pagination.getPage(), pagination.getSize(), sort);
+    }
+
+    private String normalizeSortBy(String sortBy) {
+        if (sortBy == null || sortBy.isBlank()) return "id";
+        java.util.Set<String> allowedFields = java.util.Set.of("id", "name", "price", "stock", "createdAt", "updatedAt");
+        if (!allowedFields.contains(sortBy)) {
+            throw new BadRequestException("Campo de ordenamiento no permitido: " + sortBy);
+        }
+        return sortBy;
+    }
+
+    private Sort.Direction normalizeDirection(String direction) {
+        if (direction == null || direction.isBlank()) return Sort.Direction.ASC;
+        if (direction.equalsIgnoreCase("asc")) return Sort.Direction.ASC;
+        if (direction.equalsIgnoreCase("desc")) return Sort.Direction.DESC;
+        throw new BadRequestException("Dirección de ordenamiento no válida: " + direction);
+    }
+
+
+    // ==========================================
+    // --- Helpers Privados de Seguridad / Ownership ---
+    // ==========================================
+
+    private ProductEntity findActiveProductOrThrow(Long id) {
+        return productRepository.findById(id)
+                .filter(product -> !product.isDeleted())
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+    }
+
+    private UserEntity findCurrentUserEntity(UserDetailsImpl currentUser) {
+        if (currentUser == null) {
+            throw new AccessDeniedException("Usuario no autenticado");
+        }
+        return userRepository.findByIdAndDeletedFalse(currentUser.getId())
+                .orElseThrow(() -> new AccessDeniedException("Usuario no autorizado o eliminado"));
+    }
+
+    private void validateOwnership(ProductEntity product, UserDetailsImpl currentUser) {
+        if (currentUser == null) {
+            throw new AccessDeniedException("Usuario no autenticado");
+        }
+        // ADMIN puede modificar cualquier producto
+        if (hasRole(currentUser, "ROLE_ADMIN")) {
+            return;
+        }
+        if (product.getOwner() == null || product.getOwner().getId() == null) {
+            throw new AccessDeniedException("El producto no tiene propietario válido");
+        }
+        // USER solo puede modificar sus propios productos
+        if (!product.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("No puedes modificar productos ajenos");
+        }
+    }
+
+    private boolean hasRole(UserDetailsImpl user, String role) {
+        return user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals(role));
+    }
+}
+</file>
+
+<file path="README.md">
+# Practica de Spring-Boot
+
+Estudiante: Alvarado Sebastián  
+Correo estudiantil: salvaradom1@est.ups.edu.ec  
+GitHUB: sebmrd
+
+---
+
+## Explicación breve de 01_configuración
+
+### ¿Cómo funciona el endpoint que creamos?
+
+Entendí que un endpoint es como una "ventanilla de atención" en una dirección específica de nuestra aplicación (en este caso, /api/status) que está configurada para recibir peticiones GET . Cuando nosotros (o el navegador) llamamos a esa ruta, nuestro código se activa e inmediatamente nos devuelve una respuesta con datos estructurados directamente en formato JSON .
+
+### ¿Cuál es la función de Spring Boot en la creación del servidor?
+
+Su función principal es simplificarnos la vida utilizando algo llamado "servidores embebidos" . En lugar de obligarnos a instalar, configurar y encender un servidor externo manualmente para poder correr nuestra aplicación web , Spring Boot ya trae un servidor (Tomcat) empaquetado por defecto dentro del proyecto . Así, al momento de ejecutar nuestro código, el framework se encarga de encender automáticamente el servidor web y habilitar nuestros endpoints sin que tengamos que hacer configuraciones complejas.
+
+### Evidencias de Configuración
+![Java Version](assets/01-java-version.png)
+
+![Servidor Ejecutando](assets/02-servidor-ejecutando.png)
+
+![Respuesta JSON](assets/03-respuesta.png)
+
+![Existencia Java](assets/04-existencia_java.png)
+
+---
+
+## Explicación breve de 02_estructura_proyecto
+
+### ¿Por qué es importante tener módulos separados?
+
+Separar un proyecto en módulos basados en dominios (como products, users, auth) imita la arquitectura de las aplicaciones empresariales reales. Esta organización divide las responsabilidades del sistema, lo que facilita la escalabilidad del proyecto, permite que múltiples desarrolladores trabajen en paralelo sin generar conflictos y simplifica la creación de pruebas unitarias al mantener el código altamente cohesivo.
+
+### ¿Cómo se relacionan los Controllers, Services y Repositories?
+
+Estas tres capas trabajan en conjunto siguiendo un flujo de comunicación estricto y unidireccional (Arquitectura MVCS):
+
+* Controllers (Capa de Presentación): Son el punto de entrada de la API. Interceptan las peticiones HTTP del cliente, validan los datos de entrada y delegan la lógica pesada al servicio correspondiente. Finalmente, estructuran y devuelven la respuesta HTTP.
+
+* Services (Capa de Negocio): Contienen el "corazón" de la aplicación. Reciben las instrucciones del controlador, ejecutan todas las reglas de negocio, validaciones o cálculos necesarios, y se comunican con el repositorio si necesitan guardar o extraer datos.
+
+* Repositories (Capa de Persistencia): Se encargan exclusivamente de la comunicación con la base de datos (usando JPA/Hibernate). Reciben órdenes del servicio para insertar, actualizar, eliminar o buscar registros.
+
+El flujo siempre es:
+Cliente → Controller → Service → Repository → Base de Datos (y viceversa para la respuesta).
+
+### ¿Qué problema evita mantener una estructura clara?
+
+Mantener esta separación estricta evita el "código espagueti", una mala práctica donde la lógica de acceso a datos, las reglas de negocio y el manejo de rutas HTTP se mezclan en un solo archivo. Al evitar esto, se previenen problemas como el alto acoplamiento (donde cambiar una línea de código rompe otra parte del sistema de forma inesperada), la dificultad para rastrear errores ("bugs") y la imposibilidad de reutilizar el código en el futuro.
+
+## Evidencias
+
+![Estructura del Proyecto](assets/05-estructura.png)
+![Java](assets/06-Java.png)
+![Árbol del Proyecto](assets/07-árbol.png)
+
+---
+
+## Explicación breve de 03_api_rest
+
+En esta práctica inicial, se estableció la cimentación de nuestra API RESTful orientada al recurso de productos. El objetivo principal fue comprender el ciclo de vida de una petición HTTP desde su recepción hasta la respuesta, gestionando los datos en memoria mediante una estructura de lista (List<UserModel>).
+
+Para garantizar la seguridad y la correcta exposición de los datos, se implementó un patrón de diseño basado en DTOs (Data Transfer Objects). Esto permitió separar la estructura interna de los modelos de dominio de la información pública que se expone al cliente, utilizando Mappers para transformar los datos entre las capas de presentación y la lógica interna de manera automática. Se desarrollaron los seis endpoints fundamentales del CRUD, permitiendo operaciones completas de lectura, creación, actualización (total y parcial) y eliminación . 
+
+## Evidencias
+
+### Evidencias de endpoints (Products)
+
+![Get Products](assets/08_get_products.png)
+![Delete](assets/09_delete_product.png)
+![Get Product ID](assets/10_get_product.png)
+![Delete No Exits](assets/11_delete_product_noexits.png)
+
+---
+
+## Explicación breve de 04_servicios
+
+En esta etapa, el proyecto evolucionó hacia una arquitectura de software más madura, aplicando el principio de Responsabilidad Única (SRP) . La lógica que anteriormente residía en los controladores se trasladó a una capa de servicios dedicada, permitiendo que los controladores se enfoquen exclusivamente en la gestión de peticiones HTTP.
+
+### Arquitectura en Capas
+
+El flujo de datos se reestructuró para favorecer un desacoplamiento efectivo:
+
+1. Users/Products Controller: Actúa como el front-end de nuestra API, siendo el único punto de entrada para el cliente; su única responsabilidad es delegar la carga de trabajo al servicio correspondiente.
+
+2. UserService/ProductService (Interfaz): Define el contrato de operaciones disponibles, lo que permite que el sistema sea flexible ante futuras implementaciones sin alterar el controlador.
+
+3. ServiceImpl: Contiene la lógica de negocio y el estado del sistema (la lista en memoria), procesando los datos mediante la inyección de dependencias para operar sobre el modelo de dominio .
+
+### Explicación de Inyección de Dependencias
+
+Se implementó la Inyección de Dependencias por Constructor, una práctica recomendada en Spring Boot que mejora la legibilidad y facilita las pruebas unitarias. En lugar de instanciar manualmente los servicios dentro del controlador, Spring Boot detecta automáticamente las implementaciones marcadas con la anotación @Service y realiza el proceso de inyección de manera transparente al iniciar el contexto de la aplicación . Esto no solo reduce la complejidad del código, sino que garantiza que cada componente reciba sus dependencias necesarias en un entorno gestionado y seguro.
+
+## Evidencias
+
+![Product Service](assets/12_product_services.png)
+![Product Service](assets/13_product_services.png)
+![Product Controller](assets/14_product_controllers.png)
+
+---
+
+## Explicación breve de 05_repositorios_persistencia
+
+### Resultados y Evidencias - Persistencia con PostgreSQL
+
+En esta etapa de la práctica, se migró la persistencia de datos desde una lista en memoria hacia una base de datos real utilizando PostgreSQL, Spring Data JPA e Hibernate.
+
+#### Flujo de Datos
+Se implementó un flujo de arquitectura en capas que asegura el desacoplamiento entre la base de datos y la interfaz del usuario:
+
+1. Cliente: Envía peticiones HTTP.
+
+2. Controller: Recibe la petición y delega al servicio.
+
+3. Service: Implementa la lógica de negocio y utiliza el repositorio para las operaciones. 
+
+4. Repository: Ejecuta las operaciones de persistencia mediante JPA.
+
+5. Entity: Representa la estructura de la tabla en PostgreSQL.
+
+6. Mapper: Realiza la conversión entre DTO, Model y Entity.
+
+#### Auditoría con BaseEntity
+Se utilizó una superclase abstracta BaseEntity para centralizar la auditoría de todas las entidades . Esta clase, marcada con @MappedSuperclass, permite que UserEntity y ProductEntity hereden automáticamente los campos de auditoría (id, createdAt, updatedAt, deleted) sin duplicidad de código.
+
+#### Evidencia: Lista de productos en PostgreSQL
+Tras realizar las peticiones POST a través de la API, se verificó la persistencia mediante una consulta directa a la base de datos.
+
+![Lista Productos](assets/15_lista.png)
+
+---
+
+## Explicación de 06_ValidaciónDTOs_&_ReglasNegocio
+
+En esta práctica, se implementó una capa de validación robusta utilizando **Jakarta Validation** para asegurar la integridad de los datos de entrada en los módulos de `users` y `products`.
+
+### Implementaciones clave:
+- [cite_start]**Validación de DTOs:** Se utilizaron anotaciones como `@NotBlank`, `@Size`, `@Email`, `@NotNull` y `@Min` para restringir los valores permitidos desde la capa de controlador mediante `@Valid` [cite: 625, 726-813, 1019-1040].
+- [cite_start]**Lógica de Dominio:** Se refactorizó la arquitectura eliminando los *Mappers* externos, moviendo la lógica de conversión a *Factory Methods* dentro de las clases modelo (`Product.java`), lo cual facilita la construcción y conversión de entidades [cite: 625, 1026-1034].
+- **Reglas de Negocio:** Se integraron validaciones en `ProductServiceImpl` para:
+    - Evitar la actualización o eliminación de productos ya marcados como eliminados lógicamente.
+    - [cite_start]Filtrar el listado (`findAll`) para no exponer productos eliminados [cite: 625, 1041-1045].
+
+### Evidencias
+
+**1. Validación de Entrada (Error 400):**
+Al enviar datos que no cumplen las restricciones de validación, la API intercepta la petición y devuelve un error de tipo `Bad Request`.
+
+![Post no Valido](assets/16_post_novalid.png)
+
+**2. Control de Reglas de Negocio:**
+Se validó exitosamente que el sistema impide operar sobre productos eliminados y los excluye de las consultas generales, garantizando la consistencia de los datos.
+
+![Post Valido](assets/17_post_valid.png)
+![Put Fallido](assets/18_put_deleted.png)
+![Producto Desaparece](assets/08_get_products.png)
+
+---
+
+## Explicación de 07_Control_Errores
+
+En esta práctica se implementó un sistema global de manejo de errores utilizando un `@RestControllerAdvice`. Esto permite centralizar las excepciones de la aplicación y devolver un formato único (`ErrorResponse`), eliminando los bloques try/catch de los controladores y evitando exponer trazas técnicas al cliente.
+
+A continuación, se presentan las evidencias de las validaciones implementadas en el módulo de productos (`products/`).
+
+### 1. Error por recurso inexistente (404 Not Found)
+
+Se valida la búsqueda de un producto que no existe en la base de datos lanzando una `NotFoundException`. 
+
+* Petición: `GET /api/products/5`
+* Resultado Esperado: Estado HTTP `404 Not Found` y el mensaje "Product not found".
+
+![Evidencia Producto Inexistente](assets/21_get_404.png)
+
+### 2. Error por conflicto de reglas de negocio (409 Conflict)
+
+Se valida que no se pueda crear un producto con un nombre ya registrado, lanzando una `ConflictException`.
+
+* Petición: `POST /api/products` (Enviando un JSON con un nombre que ya existe en la BD).
+* Cuerpo enviado:
+    ```json
+    {
+        "name": "Iphone 17 Pro Max",
+        "price": 1125,
+        "stock": 3
+    }
+
+* Resultado Esperado: Estado HTTP `409 Conflict` y el texto "Product name already registered".
+
+![Evidencia Conflicto de Nombre](assets/19_post_409.png)
+
+### 3. Error por validación de DTO (400 Bad Request)
+
+Se valida la entrada de datos a través de las anotaciones `@Valid` en los DTOs. Si los datos no cumplen con los requisitos (nombres vacíos, precios o stock negativos), se captura la `MethodArgumentNotValidException`.
+
+* Petición: `POST /api/products`
+* Cuerpo enviado:
+  ```json
+  {
+    "name": "",
+    "price": -5,
+    "stock": -1
+  }
+* Resultado Esperado: Estado HTTP `400 Bad Request`
+
+![Evidencia Datos Inválidos](assets/20_post_400.png)
+
+---
+
+## Explicación de la Practica 08_relación_entidades
+
+### ¿Cómo se relaciona ProductEntity con UserEntity y CategoryEntity usando @ManyToOne y @JoinColumn?
+
+#### La Lógica de la Relación
+
+* **Muchos Productos, un Usuario:** Muchos productos (ProductEntity) pueden ser creados, vendidos o gestionados por un mismo usuario (UserEntity).
+
+* **Muchos Productos, una Categoría:** Muchos productos (ProductEntity) pertenecen a una sola categoría (CategoryEntity).
+
+En este escenario, ProductEntity es la entidad dueña de la relación, lo que significa que su tabla correspondiente en la base de datos contendrá las columnas de clave foránea (FK).
+
+#### ¿Qué hace cada anotación?
+
+* **@ManyToOne:** Le dice a JPA que la entidad actual (ProductEntity) tiene una relación de muchos a uno con el tipo de dato del campo (ej. UserEntity).
+
+* **@JoinColumn(name = "..."):** Define el nombre de la columna física de la clave foránea (Foreign Key) que se creará en la tabla de productos para almacenar el ID del usuario o de la categoría.
+
+---
+
+## Explicación de la Practica 09_relación_requestparam
+
+### ¿Por qué se usa ProductService y ProductRepository para consultar productos aunque el endpoint esté en UsersController o CategoriesController?
+
+Porque el contexto semántico de la URL (ej. /users/{id}/products) solo sirve para organizar la API de forma lógica para el cliente, pero el "recurso" principal que estamos consultando, filtrando y devolviendo sigue siendo un Producto. Delegar esta tarea al ProductRepository permite realizar consultas explícitas y eficientes a la base de datos (usando SQL con filtros WHERE y JOIN), en lugar de sobrecargar la memoria de la aplicación intentando navegar por las colecciones de un UserEntity o CategoryEntity mediante JPA.
+
+### ¿Qué cambió al pasar de Product N - 1 Category a Product N - N Category?
+
+1. Base de datos: Se eliminó la columna category_id de la tabla products y se generó una tabla intermedia automática llamada product_categories para almacenar los pares de IDs (producto - categoría).
+
+2. JPA: Se reemplazó la anotación @ManyToOne por @ManyToMany y @JoinTable, usando colecciones (Set<CategoryEntity>) en lugar de un objeto individual.
+
+3. Lógica de negocio y SQL: Se modificaron los DTOs para recibir arreglos de IDs (Set<Long> categoryIds). Además, las consultas en el repositorio pasaron de usar una simple igualdad (p.category.id = :id) a requerir un JOIN p.categories c acompañado de un SELECT DISTINCT p para evitar que la base de datos devuelva productos duplicados en el resultado.
+
+---
+
+## Explicación de la Practica 10_paginacion
+
+### ¿Cuál es la diferencia entre Page y Slice?
+
+Page ejecuta dos consultas SQL a la base de datos: una para traer los registros de la página actual y otra (COUNT) para calcular el total de elementos y páginas existentes. Esto lo hace ideal para tablas administrativas donde necesitas mostrar controles precisos (Ej: "Página 1 de 20").
+Slice, en cambio, es mucho más ligero porque no hace la consulta de conteo (COUNT). Solo trae los registros solicitados más uno adicional para saber si hay una "página siguiente" (hasNext). Es ideal para flujos rápidos como "Scroll Infinito" en aplicaciones móviles o web.
+
+### ¿Por qué la paginación debe aplicarse en el repositorio y no después de traer todos los datos a Java?
+
+Porque evita la sobrecarga de la memoria (RAM) del servidor y el colapso del ancho de banda. Si la tabla tiene 100,000 productos y paginamos en Java, estaríamos obligando a la base de datos a enviar los 100,000 registros completos a través de la red, para luego descartar 99,990 en memoria. Al aplicar la paginación en el repositorio, la base de datos procesa los comandos LIMIT y OFFSET a nivel de SQL, enviando únicamente los 10 registros que el cliente solicitó, lo que resulta en respuestas de milisegundos.
+
+---
+
+## Explicación de la Practica 11_autenticación_Autorización
+
+### Conceptos Fundamentales
+
+* **Autenticación:** Es el proceso de verificar la identidad del usuario (¿Quién eres?). Por ejemplo, cuando el usuario ingresa su usuario y contraseña.
+
+* **Autorización:** Es el proceso de verificar a qué recursos tiene acceso el usuario autenticado (¿Qué tienes permitido hacer?). Por ejemplo, determinar si un usuario es ROLE_USER o ROLE_ADMIN.
+
+* **JWT (JSON Web Token):** Es un token compacto y seguro para URL que contiene información (claims) sobre el usuario. Al ser firmado digitalmente (usando una clave secreta), el servidor puede confiar en su autenticidad sin necesidad de guardar una sesión en la base de datos.
+
+### 2. El Flujo de Trabajo (Workflow)
+
+El control de acceso con JWT sigue un flujo simple de 4 pasos:
+
+1. **Inicio de sesión:** El cliente (frontend) envía sus credenciales (usuario/password) en una petición POST.
+
+2. **Generación del Token:** Spring Security valida las credenciales. Si son correctas, genera un JWT firmado con una clave secreta y lo devuelve al cliente.
+
+3. **Peticiones Protegidas:** Para cualquier consulta posterior (ej. ver el perfil o crear un producto), el cliente envía el JWT en la cabecera HTTP de la petición: Authorization: Bearer <token>.
+
+4. **Validación y Acceso:** Spring Boot intercepta la petición, valida la firma del token, extrae los roles/permisos del usuario y le permite (o deniega) el acceso.
+
+### Componentes Clave en Spring Boot
+
+Para implementar esto, se configuran principalmente tres elementos en el código:
+
+* **SecurityFilterChain (Configuración):** Es la clase donde defines qué rutas son públicas (como /login o /register) y cuáles requieren autenticación o roles específicos.
+
+* **JwtFilter (Filtro Personalizado):** Un interceptor que se ejecuta en cada petición para extraer el token de la cabecera, verificar que no haya expirado y cargar el contexto de seguridad si el token es válido.
+
+* **JwtProvider / JwtUtils (Utilidades):** La clase encargada de crear el token (definiendo el tiempo de expiración y los claims) y de parsearlo/validarlo cuando regresa.
+
+### ¿Por qué se usa? (Ventajas)
+
+* **Stateless (Sin estado):** El servidor no guarda sesiones en memoria, lo que hace que la aplicación sea altamente escalable y perfecta para arquitecturas de microservicios.
+
+* **Separación Frontend/Backend:** Ideal para conectar con aplicaciones de React, Angular, Vue o apps móviles.
+
+---
+
+## Explicación de la Practica 12_roles_preauthorize
+
+En Spring Boot, una vez que el usuario está autenticado (por ejemplo, mediante el JWT que vimos antes), el siguiente paso es controlar qué acciones específicas puede realizar. Aquí es donde entran en juego los Roles y la anotación @PreAuthorize.
+
+Esta combinación permite implementar un Control de Acceso Basado en Roles (RBAC) de forma elegante y directamente sobre los métodos de tu código.
+
+### Roles vs. Autoridades (GrantedAuthority)
+
+En Spring Security, los permisos se manejan bajo el concepto genérico de "Autoridades". Sin embargo, hay una distinción clave en la práctica:
+
+* **Roles:** Representan un grupo de permisos de alto nivel (ej. ADMIN, USER, MANAGER). Por convención en Spring Security, los roles en la base de datos o en el token deben llevar el prefijo ROLE_ (por ejemplo, ROLE_ADMIN).
+
+* **Privilegios/Permisos:** Son acciones atómicas y específicas (ej. READ_PRIVILEGE, WRITE_PRIVILEGE).
+
+### ¿Qué es @PreAuthorize?
+
+Es una anotación de Spring Security que se coloca justo encima de los métodos de tus Controllers o Services. Permite definir expresiones lógicas (usando SpEL - Spring Expression Language) que se evalúan antes de que el método se ejecute. Si el usuario no cumple con la condición, Spring bloquea la ejecución y lanza una excepción de acceso denegado (403 Forbidden).
+
+Para poder usarla, primero debes activar la seguridad por método en tu clase de configuración con @EnableMethodSecurity.
+
+### Ventajas de este Enfoque
+
+* **Seguridad Declarativa:** No llenas tu lógica de negocio con condicionales if (usuario.hasRole(...)). La seguridad se declara de forma limpia arriba del método.
+
+* **Granularidad Fina:** Puedes proteger rutas enteras desde la configuración global, pero @PreAuthorize te permite asegurar métodos específicos dentro de una misma clase.
+
+* **Flexibilidad:** Además de hasRole(), puedes usar expresiones como hasAuthority('PERMISO_ESCRITURA') o incluso validar si el usuario que hace la petición es el mismo dueño del recurso (ej. @PreAuthorize("#username == authentication.principal.username")).
+
+---
+
+## Explicación de la PRactica 13_ownership_validacion
+
+### ¿Qué es ownership?
+
+Es el concepto de propiedad de un recurso en el sistema. Significa vincular un registro específico (como un producto) a un usuario concreto, asegurando que por defecto solo su creador o dueño legítimo tenga los permisos necesarios para modificarlo o eliminarlo.
+
+### ¿Por qué no es seguro recibir userId en CreateProductDto?
+
+Porque un usuario malintencionado podría interceptar o manipular el cuerpo de la petición (el JSON) y enviar el ID de otro usuario. Esto le permitiría crear registros a nombre de terceros sin su consentimiento. Al extraer la identidad directamente del token JWT en el backend, garantizamos la integridad del autor.
+
+### ¿Cuál es la diferencia entre autorización por rol y autorización por ownership?
+
+La autorización por rol define qué tipo de acciones generales puede realizar un usuario (ej. un ADMIN puede ver la lista de todos los productos, un USER no). La autorización por ownership define sobre qué registros específicos puede actuar dentro de esas acciones permitidas (ej. un USER tiene permiso para editar productos, pero el ownership restringe esa acción exclusivamente a los productos que él mismo creó).
+
+---
+
+## Explicación de la Practica 14_despliegue_produccion
+
+### Preparación de la API para Producción
+
+Antes de subir el código a un servidor, debes "vestir de gala" tu aplicación Spring Boot. Esto incluye:
+
+* **Perfiles de Spring (Profiles):** No usas la misma base de datos en tu computadora (desarrollo) que en el servidor real (producción). Usas perfiles como application-dev.properties y application-prod.properties para separar estas configuraciones de forma automática.
+
+* **Gestión de Variables de Entorno:** Las contraseñas de la base de datos o las llaves de APIs externas nunca se dejan escritas en el código. Se configuran como variables de entorno en el servidor por seguridad.
+
+* **Monitoreo con Spring Boot Actuator:** Una dependencia clave que expone "endpoints" (rutas) para revisar la salud de la aplicación (/actuator/health), ver el consumo de memoria y asegurarse de que todo corra bien.
+
+### Empaquetado de la Aplicación
+
+Spring Boot facilita enormemente este paso gracias a su concepto de Fat JAR (o JAR ejecutable).
+
+A diferencia de Java tradicional donde necesitabas instalar un servidor como Tomcat por separado, Spring Boot compila todo tu código, tus dependencias y un servidor Tomcat embebido dentro de un único archivo .jar.
+
+* Para generarlo, usualmente ejecutas comandos como ./gradlew build (si usas Gradle).
+
+### Estrategias de Despliegue (Dónde y cómo corre)
+
+Una vez que tienes tu archivo .jar, hay varias formas de ponerlo en producción:
+
+* **Despliegue Tradicional (VPS/IaaS):** Subes el .jar a un servidor en la nube (como AWS EC2 o DigitalOcean) mediante SSH y lo ejecutas con el comando java -jar tu-aplicacion.jar.
+
+* **Contenedores con Docker:** Metes el .jar dentro de un contenedor Docker. Esto asegura que la aplicación corra exactamente igual en cualquier servidor del mundo, resolviendo problemas de compatibilidad de software.
+
+* **Plataformas como Servicio (PaaS):** Usar servicios que te quitan el dolor de cabeza de administrar servidores (como Railway, Render, AWS Elastic Beanstalk o Heroku). Tú solo subes el código o el JAR, y ellos se encargan del resto.
+</file>
+
+</files>

@@ -29,4 +29,16 @@ public class AuthController {
         AuthResponseDto response = authService.register(registerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDto> refresh(@Valid @RequestBody ec.edu.ups.icc.fundamentos01.security.dtos.RefreshTokenRequestDto request) {
+        AuthResponseDto response = authService.refresh(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody ec.edu.ups.icc.fundamentos01.security.dtos.RefreshTokenRequestDto request) {
+        authService.logout(request);
+    }
 }
