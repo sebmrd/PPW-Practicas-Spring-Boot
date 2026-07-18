@@ -159,7 +159,7 @@ Se validó exitosamente que el sistema impide operar sobre productos eliminados 
 
 ---
 
-## Explicación de 07_Control_Errores
+## Explicación de la Práctica: 07_Control_Errores
 
 En esta práctica se implementó un sistema global de manejo de errores utilizando un `@RestControllerAdvice`. Esto permite centralizar las excepciones de la aplicación y devolver un formato único (`ErrorResponse`), eliminando los bloques try/catch de los controladores y evitando exponer trazas técnicas al cliente.
 
@@ -209,7 +209,7 @@ Se valida la entrada de datos a través de las anotaciones `@Valid` en los DTOs.
 
 ---
 
-## Explicación de la Practica 08_relación_entidades
+## Explicación de la Práctica 08_relación_entidades
 
 ### ¿Cómo se relaciona ProductEntity con UserEntity y CategoryEntity usando @ManyToOne y @JoinColumn?
 
@@ -229,7 +229,7 @@ En este escenario, ProductEntity es la entidad dueña de la relación, lo que si
 
 ---
 
-## Explicación de la Practica 09_relación_requestparam
+## Explicación de la Práctica 09_relación_requestparam
 
 ### ¿Por qué se usa ProductService y ProductRepository para consultar productos aunque el endpoint esté en UsersController o CategoriesController?
 
@@ -245,7 +245,7 @@ Porque el contexto semántico de la URL (ej. /users/{id}/products) solo sirve pa
 
 ---
 
-## Explicación de la Practica 10_paginacion
+## Explicación de la Práctica 10_paginacion
 
 ### ¿Cuál es la diferencia entre Page y Slice?
 
@@ -258,7 +258,7 @@ Porque evita la sobrecarga de la memoria (RAM) del servidor y el colapso del anc
 
 ---
 
-## Explicación de la Practica 11_autenticación_Autorización
+## Explicación de la Práctica 11_autenticación_Autorización
 
 ### Conceptos Fundamentales
 
@@ -298,7 +298,7 @@ Para implementar esto, se configuran principalmente tres elementos en el código
 
 ---
 
-## Explicación de la Practica 12_roles_preauthorize
+## Explicación de la Práctica 12_roles_preauthorize
 
 En Spring Boot, una vez que el usuario está autenticado (por ejemplo, mediante el JWT que vimos antes), el siguiente paso es controlar qué acciones específicas puede realizar. Aquí es donde entran en juego los Roles y la anotación @PreAuthorize.
 
@@ -344,7 +344,7 @@ La autorización por rol define qué tipo de acciones generales puede realizar u
 
 ---
 
-## Explicación de la Practica 14_despliegue_produccion
+## Explicación de la Práctica 14_despliegue_produccion
 
 ### Preparación de la API para Producción
 
@@ -376,7 +376,7 @@ Una vez que tienes tu archivo .jar, hay varias formas de ponerlo en producción:
 
 ---
 
-## Explicación de la Practica: 14_refresh_toekn_pt2
+## Explicación de la Práctica: 14_refresh_toekn_pt2
 
 ### ¿Cuál es la diferencia entre Access Token y Refresh Token?
 
@@ -398,7 +398,7 @@ La rotación de Refresh Tokens (Refresh Token Rotation) es una medida de segurid
 
 ---
 
-## Explicación breve de la Practica: 15_swagger
+## Explicación breve de la Práctica: 15_swagger
 
 ### Diferencia entre Swagger UI y OpenAPI
 
@@ -424,3 +424,29 @@ Para que Swagger UI entienda que tu API requiere un token y te permita enviarlo 
 
 **¿Cómo funciona para el usuario?**
 Una vez configurado, el desarrollador hace clic en el botón "Authorize", pega su token JWT directamente en el cuadro de texto y cierra la ventana flotante. A partir de ese momento, cada vez que el usuario presione el botón "Try it out" (Probar) en cualquier endpoint, Swagger UI inyectará de forma automática e invisible la cabecera Authorization con el valor Bearer <token> en la petición antes de enviarla al servidor.
+
+---
+
+## Explicación breve de la Práctica: 16_docker_ubuntu_server
+
+### Despliegue portable de Spring Boot con Docker y Nginx en Ubuntu Server
+
+Este tema consiste en preparar tu aplicación para que una única imagen de Docker pueda ejecutarse en cualquier entorno (tu entorno de desarrollo, una máquina virtual con Ubuntu Server o plataformas en la nube como Render) sin necesidad de modificar el código ni reconstruir la imagen para cada lugar.
+
+Para lograr esta portabilidad, la configuración específica de cada ambiente se inyecta desde afuera al momento de arrancar el contenedor, utilizando perfiles de Spring Boot, variables de entorno y archivos .env (como el .env.ubuntu que creaste).
+
+En la arquitectura de este despliegue, Nginx funciona como un proxy inverso; es decir, recibe el tráfico HTTP por el puerto 80 y lo redirige internamente al contenedor de Spring Boot, el cual opera de forma segura en el puerto 8080 dentro de una red virtual de Docker (app-network). Toda esta infraestructura se gestionó mediante comandos puros de Docker, demostrando un control manual sin depender de herramientas automatizadas como Docker Compose.
+
+### Conexión a PostgreSQL externo
+
+En esta práctica, la base de datos PostgreSQL no está dentro del contenedor de la aplicación ni dentro de la máquina virtual de Ubuntu Server, sino que se ejecuta de forma externa, directamente en la máquina anfitriona (la computadora principal).
+
+Aquí te detallo cómo se articuló esta conexión en tu proyecto específico:
+
+* **Enrutamiento por Red Host-Only:** Para que la máquina virtual (Ubuntu Server) pudiera comunicarse con la base de datos de la computadora física, se utilizó una red Host-Only configurada en VirtualBox. En esta red, la computadora host asumió la IP 192.168.56.1, mientras que el Ubuntu Server tomó la IP 192.168.56.2.
+
+* **Inyección Dinámica de la URL:** En lugar de "quemar" la ruta localhost en el código fuente de Spring Boot, el contenedor recibió la ruta de conexión a través de la variable de entorno DATABASE_URL=jdbc:postgresql://192.168.56.1:5432/devdb provista por el archivo .env.ubuntu.
+
+* **Apertura de Puertos en el Host:** Para que la conexión fuera exitosa, fue obligatorio modificar los archivos de configuración del PostgreSQL local en la máquina. Se ajustó el postgresql.conf para que escuchara en la IP 192.168.56.1 y el pg_hba.conf para permitir conexiones entrantes del usuario ups desde la subred 192.168.56.0/24.
+
+* **El propósito central:** Esta estructura demuestra el verdadero principio de portabilidad de la imagen. Al lograr que el contenedor se conecte a una base de datos externa mediante una URL inyectada por variables, probamos que la imagen generada es independiente del servidor. Este es exactamente el mismo patrón que se utiliza en la industria al conectarse a bases de datos administradas en la nube (como en Render); no se requiere reconstruir la imagen ni compilar el código nuevamente para cambiar de servidor de base de datos.

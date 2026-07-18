@@ -39,9 +39,9 @@ springBoot {
 }
 
 tasks.bootJar {
-    archiveFileName.set("mi-api.jar")
+    archiveFileName.set("app.jar")
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+tasks.jar {
+    enabled = false
 }
